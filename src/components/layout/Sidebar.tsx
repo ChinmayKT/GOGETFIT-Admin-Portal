@@ -69,14 +69,12 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
             <img src={favicon} alt="GoGetFit" className={styles.faviconImg} />
           </span>
         ) : (
-          <>
+          <span className={styles.brandStack}>
             <span className={styles.logoChip}>
               <img src={logo} alt="GoGetFit" className={styles.logoImg} />
             </span>
-            <span className={styles.brandText}>
-              <small>ADMIN PORTAL</small>
-            </span>
-          </>
+            <small className={styles.brandCaption}>ADMIN PORTAL</small>
+          </span>
         )}
       </div>
 
