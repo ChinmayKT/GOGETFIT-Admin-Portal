@@ -5,7 +5,7 @@ import { Dropdown } from "../ui/Dropdown";
 import { Avatar } from "../ui/Avatar";
 import { StatusBadge } from "../ui/StatusBadge";
 import { OPERATIONAL_ALERTS } from "../../mock/system/alerts";
-import { useCurrentAdmin } from "../../app/providers/AuthProvider";
+import { useAuth, useCurrentAdmin } from "../../app/providers/AuthProvider";
 import { useRole } from "../../app/providers/RoleProvider";
 import { useNavigate } from "react-router-dom";
 import styles from "./Topbar.module.css";
@@ -14,6 +14,7 @@ export function Topbar() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const admin = useCurrentAdmin();
+  const { logout } = useAuth();
   const { role, roles, setRoleId } = useRole();
   const navigate = useNavigate();
 
@@ -76,7 +77,15 @@ export function Topbar() {
           }
           items={[
             { label: "Profile settings", onClick: () => navigate("/system/settings") },
-            { label: "Sign out", onClick: () => {}, danger: true, icon: <LogOut size={14} /> },
+            {
+              label: "Sign out",
+              onClick: () => {
+                logout();
+                navigate("/login", { replace: true });
+              },
+              danger: true,
+              icon: <LogOut size={14} />,
+            },
           ]}
         />
       </div>

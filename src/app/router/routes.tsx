@@ -1,6 +1,8 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import { AppShell } from "../../components/layout/AppShell";
 import { PlaceholderPage } from "../../components/layout/PlaceholderPage";
+import { LoginPage } from "../../features/auth/LoginPage";
+import { RequireAuth } from "./RequireAuth";
 import { DashboardPage } from "../../features/dashboard/DashboardPage";
 import { UserListPage } from "../../features/users/UserListPage";
 import { ClientListPage } from "../../features/users/ClientListPage";
@@ -68,9 +70,14 @@ import { FeatureFlagsPage } from "../../features/system/FeatureFlagsPage";
 const placeholder = (title: string) => <PlaceholderPage title={title} />;
 
 export const router = createBrowserRouter([
+  { path: "/login", element: <LoginPage /> },
   {
     path: "/",
-    element: <AppShell />,
+    element: (
+      <RequireAuth>
+        <AppShell />
+      </RequireAuth>
+    ),
     children: [
       { index: true, element: <Navigate to="/dashboard" replace /> },
       { path: "dashboard", element: <DashboardPage /> },
