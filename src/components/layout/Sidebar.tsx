@@ -7,7 +7,7 @@ import {
   Wallet, CreditCard, ArrowLeftRight, RotateCcw, TrendingUp, RefreshCw, Crown,
 } from "lucide-react";
 import { GoGetFitMark } from "./GoGetFitMark";
-import logo from "../../assets/brand/gogetfit-logo-dark.jpeg";
+import logo from "../../assets/brand/gogetfit-logo-transparent.png";
 import { NAV_GROUPS } from "../../constants/navigation";
 import { useRole } from "../../app/providers/RoleProvider";
 import { cn } from "../../utils/cn";
