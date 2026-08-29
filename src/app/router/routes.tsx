@@ -27,6 +27,15 @@ import { ParticipantDetailPage } from "../../features/challenges/ParticipantDeta
 import { RewardsPage } from "../../features/rewards/RewardsPage";
 import { TransformationsPage } from "../../features/progress/TransformationsPage";
 import { MeasurementsPage } from "../../features/progress/MeasurementsPage";
+import { FaqListPage } from "../../features/content/FaqListPage";
+import { FaqFormPage } from "../../features/content/FaqFormPage";
+import { QuotesPage } from "../../features/content/QuotesPage";
+import { ArticleListPage } from "../../features/content/ArticleListPage";
+import { ArticleFormPage } from "../../features/content/ArticleFormPage";
+import { BannerListPage } from "../../features/content/BannerListPage";
+import { BannerFormPage } from "../../features/content/BannerFormPage";
+import { BannerViewPage } from "../../features/content/BannerViewPage";
+import { MediaLibraryPage } from "../../features/content/MediaLibraryPage";
 
 const placeholder = (title: string) => <PlaceholderPage title={title} />;
 
@@ -77,11 +86,18 @@ export const router = createBrowserRouter([
       { path: "progress/transformations", element: <TransformationsPage /> },
       { path: "progress/measurements", element: <MeasurementsPage /> },
 
-      { path: "content/articles", element: placeholder("Articles") },
-      { path: "content/banners", element: placeholder("Banners") },
-      { path: "content/faqs", element: placeholder("FAQs") },
-      { path: "content/quotes", element: placeholder("Quotes") },
-      { path: "content/media", element: placeholder("Media Library") },
+      { path: "content/articles", element: <ArticleListPage /> },
+      { path: "content/articles/new", element: <ArticleFormPage /> },
+      { path: "content/articles/:id/edit", element: <ArticleFormPage /> },
+      { path: "content/banners", element: <BannerListPage /> },
+      { path: "content/banners/new", element: <BannerFormPage /> },
+      { path: "content/banners/:id", element: <BannerViewPage /> },
+      { path: "content/banners/:id/edit", element: <BannerFormPage /> },
+      { path: "content/faqs", element: <FaqListPage /> },
+      { path: "content/faqs/new", element: <FaqFormPage /> },
+      { path: "content/faqs/:id/edit", element: <FaqFormPage /> },
+      { path: "content/quotes", element: <QuotesPage /> },
+      { path: "content/media", element: <MediaLibraryPage /> },
 
       { path: "commerce/products", element: placeholder("Products") },
       { path: "commerce/packages", element: placeholder("Packages") },

@@ -1,0 +1,104 @@
+.root {
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--glass-fill);
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--glass-border);
+  background: var(--glass-fill-bright);
+}
+
+.toolBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+}
+.toolBtn:hover {
+  background: var(--glass-fill-hover);
+  color: var(--text-primary);
+}
+
+.hint {
+  margin-left: var(--space-2);
+  font-size: var(--fs-caption);
+  color: var(--text-muted);
+}
+
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+@media (max-width: 900px) {
+  .split {
+    grid-template-columns: 1fr;
+  }
+}
+
+.textarea {
+  min-height: 280px;
+  padding: var(--space-4);
+  border: none;
+  border-right: 1px solid var(--glass-border);
+  background: transparent;
+  color: var(--text-primary);
+  font-family: var(--font-family-mono);
+  font-size: var(--fs-label);
+  line-height: var(--lh-body);
+  resize: vertical;
+}
+.textarea:focus {
+  outline: none;
+  background: var(--glass-fill-bright);
+}
+@media (max-width: 900px) {
+  .textarea {
+    border-right: none;
+    border-bottom: 1px solid var(--glass-border);
+  }
+}
+
+.preview {
+  padding: var(--space-4);
+  min-height: 280px;
+  overflow-y: auto;
+  color: var(--text-primary);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+}
+.preview :global(h2),
+.preview :global(h3),
+.preview :global(h4) {
+  margin: 0 0 var(--space-2);
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+}
+.preview :global(p) {
+  margin: 0 0 var(--space-3);
+  color: var(--text-secondary);
+}
+.preview :global(ul) {
+  margin: 0 0 var(--space-3);
+  padding-left: var(--space-5);
+  color: var(--text-secondary);
+}
+.preview :global(strong) {
+  color: var(--text-primary);
+  font-weight: var(--fw-semibold);
+}
+.preview :global(.muted) {
+  color: var(--text-muted);
+}

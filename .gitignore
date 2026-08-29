@@ -25,3 +25,6 @@ dist-ssr
 
 # local smoke-test scripts (run from repo root during dev to satisfy node module resolution)
 /smoke*.mjs
+
+# local Claude Code session state
+.claude/
