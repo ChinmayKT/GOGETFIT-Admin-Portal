@@ -50,6 +50,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { label: "FAQs", path: "/content/faqs", module: "content" },
       { label: "Quotes", path: "/content/quotes", module: "content" },
       { label: "Media Library", path: "/content/media", module: "content" },
+      { label: "GOGETFIT Plans", path: "/content/gogetfit-plans", module: "content" },
     ],
   },
   {

@@ -3,12 +3,21 @@ import {
   LayoutDashboard, Users, UserCheck, Award, Link2, Utensils, Apple, Inbox, ClipboardList,
   Dumbbell, Trophy, Gift, Sparkles, Ruler, FileText, Image, HelpCircle, Quote, Folder,
   Package, Boxes, ShoppingCart, Ticket, Bell, BarChart3, UserCog, ShieldCheck, History,
-  Settings, ToggleLeft, ChevronsLeft, ChevronsRight,
-  Wallet, CreditCard, ArrowLeftRight, RotateCcw, TrendingUp, RefreshCw, Crown,
+  Settings, ToggleLeft,
+  Wallet, CreditCard, ArrowLeftRight, RotateCcw, TrendingUp, RefreshCw, Crown, Tag,
 } from "lucide-react";
 import logo from "../../assets/brand/gogetfit-logo-transparent.png";
 import favicon from "../../assets/brand/favicon.png";
 import { NAV_GROUPS } from "../../constants/navigation";
+
+// A nav path like "/finance" must only be marked active for an exact match —
+// otherwise NavLink also treats it as active on every one of its own sibling
+// routes ("/finance/payments", "/finance/coaches", ...), lighting up two items
+// at once. Only paths that are themselves a prefix of another nav path need
+// `end`; leaf paths (e.g. "/coaches") should stay non-`end` so they keep
+// highlighting on their own un-listed detail routes ("/coaches/:id").
+const ALL_NAV_PATHS = NAV_GROUPS.flatMap((g) => g.items.map((i) => i.path));
+const EXACT_MATCH_PATHS = new Set(ALL_NAV_PATHS.filter((path) => ALL_NAV_PATHS.some((other) => other !== path && other.startsWith(`${path}/`))));
 import { useRole } from "../../app/providers/RoleProvider";
 import { cn } from "../../utils/cn";
 import styles from "./Sidebar.module.css";
@@ -33,6 +42,7 @@ const ICONS: Record<string, typeof LayoutDashboard> = {
   "/content/faqs": HelpCircle,
   "/content/quotes": Quote,
   "/content/media": Folder,
+  "/content/gogetfit-plans": Tag,
   "/commerce/products": Package,
   "/commerce/packages": Boxes,
   "/commerce/orders": ShoppingCart,
@@ -63,7 +73,12 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
 
   return (
     <aside className={cn(styles.root, collapsed && styles.collapsed)}>
-      <div className={styles.brand}>
+      <button
+        type="button"
+        className={styles.brand}
+        onClick={onToggle}
+        aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+      >
         {collapsed ? (
           <span className={styles.brandMark}>
             <img src={favicon} alt="GoGetFit" className={styles.faviconImg} />
@@ -76,10 +91,6 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
             <small className={styles.brandCaption}>ADMIN PORTAL</small>
           </span>
         )}
-      </div>
-
-      <button className={styles.collapseBtn} onClick={onToggle} aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}>
-        {collapsed ? <ChevronsRight size={16} /> : <ChevronsLeft size={16} />}
       </button>
 
       <nav className={styles.nav}>
@@ -95,6 +106,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                   <NavLink
                     key={item.path}
                     to={item.path}
+                    end={EXACT_MATCH_PATHS.has(item.path)}
                     className={({ isActive }) => cn(styles.item, isActive && styles.active)}
                     title={collapsed ? item.label : undefined}
                   >

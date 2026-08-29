@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Pencil, Link2, FileBadge } from "lucide-react";
 import { GlassCard } from "../../components/ui/GlassCard";
-import { Avatar } from "../../components/ui/Avatar";
+import { ProfileHeaderEditor } from "../../components/media/ProfileHeaderEditor";
 import { StatusBadge, type StatusTone } from "../../components/ui/StatusBadge";
 import { Tabs } from "../../components/ui/Tabs";
 import { Button } from "../../components/ui/Button";
@@ -71,11 +71,16 @@ export function CoachDetailPage() {
         </div>
       </div>
 
-      <div className={styles.header}>
-        <Avatar name={`${coach.firstName} ${coach.lastName}`} src={coach.profilePicture ?? undefined} size="xl" />
-        <div className={styles.headerInfo}>
+      <GlassCard padding="none" style={{ padding: "20px 20px 24px", marginBottom: 24 }}>
+        <ProfileHeaderEditor
+          readOnly
+          name={`${coach.firstName} ${coach.lastName}`}
+          coverUrl={coach.coverPhoto}
+          avatarUrl={coach.profilePicture}
+        />
+        <div>
           <h1 className={styles.name}>{coach.firstName} {coach.lastName}</h1>
-          <div className={styles.metaRow}>
+          <div className={styles.metaRow} style={{ marginTop: 6 }}>
             <span className="text-caption">Level {coach.level}</span>
             <StatusBadge label={coach.status} tone={STATUS_TONE[coach.status]} />
             <span className="text-caption">{coach.specialization}</span>
@@ -83,7 +88,7 @@ export function CoachDetailPage() {
             <span className="text-caption">Joined {formatDate(coach.joinedAt)}</span>
           </div>
         </div>
-      </div>
+      </GlassCard>
 
       <div className={styles.tabsRow}>
         <Tabs tabs={TABS} active={tab} onChange={setTab} />

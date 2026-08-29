@@ -1,10 +1,8 @@
 import { useState } from "react";
-import { Search, Bell, ChevronDown, LogOut, UserCog } from "lucide-react";
+import { Search, ChevronDown, LogOut, UserCog } from "lucide-react";
 import { CommandSearch } from "../ui/CommandSearch";
 import { Dropdown } from "../ui/Dropdown";
 import { Avatar } from "../ui/Avatar";
-import { StatusBadge } from "../ui/StatusBadge";
-import { OPERATIONAL_ALERTS } from "../../mock/system/alerts";
 import { useAuth, useCurrentAdmin } from "../../app/providers/AuthProvider";
 import { useRole } from "../../app/providers/RoleProvider";
 import { useNavigate } from "react-router-dom";
@@ -12,7 +10,6 @@ import styles from "./Topbar.module.css";
 
 export function Topbar() {
   const [searchOpen, setSearchOpen] = useState(false);
-  const [notifOpen, setNotifOpen] = useState(false);
   const admin = useCurrentAdmin();
   const { logout } = useAuth();
   const { role, roles, setRoleId } = useRole();
@@ -38,31 +35,6 @@ export function Topbar() {
           }
           items={roles.map((r) => ({ label: r.name, onClick: () => setRoleId(r.id) }))}
         />
-
-        <div className={styles.notifWrap}>
-          <button className={styles.iconBtn} onClick={() => setNotifOpen((o) => !o)} aria-label="Notifications">
-            <Bell size={17} />
-            {OPERATIONAL_ALERTS.length > 0 && <span className={styles.badge}>{OPERATIONAL_ALERTS.length}</span>}
-          </button>
-          {notifOpen && (
-            <div className={styles.notifPanel}>
-              <p className={styles.notifHeading}>Needs attention</p>
-              {OPERATIONAL_ALERTS.map((a) => (
-                <button
-                  key={a.id}
-                  className={styles.notifItem}
-                  onClick={() => {
-                    navigate(a.path);
-                    setNotifOpen(false);
-                  }}
-                >
-                  <span>{a.label}</span>
-                  <StatusBadge label={String(a.count)} tone={a.tone} dot={false} />
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
 
         <Dropdown
           trigger={

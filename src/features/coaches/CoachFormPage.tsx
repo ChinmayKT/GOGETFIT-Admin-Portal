@@ -8,12 +8,11 @@ import { Field } from "../../components/forms/Field";
 import { Input } from "../../components/forms/Input";
 import { Select } from "../../components/forms/Select";
 import { Textarea } from "../../components/forms/Textarea";
-import { FileUploader, toUploadedFile, type UploadedFile } from "../../components/media/FileUploader";
+import { ProfileHeaderEditor } from "../../components/media/ProfileHeaderEditor";
 import { SkeletonForm } from "../../components/feedback/Skeleton";
 import { useToast } from "../../components/feedback/ToastProvider";
 import { getCoach, createCoach, updateCoach } from "../../mock/coaches/repository";
 import { CITIES, LANGUAGES, SPECIALIZATIONS } from "../../mock/shared/reference";
-import { nextId } from "../../mock/shared/utils";
 import styles from "../users/UserFormPage.module.css";
 
 interface FormState {
@@ -48,7 +47,8 @@ export function CoachFormPage() {
   const navigate = useNavigate();
   const { show } = useToast();
   const [form, setForm] = useState<FormState>(EMPTY);
-  const [photo, setPhoto] = useState<UploadedFile[]>([]);
+  const [profilePictureUrl, setProfilePictureUrl] = useState<string | null>(null);
+  const [coverPhotoUrl, setCoverPhotoUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
@@ -63,7 +63,8 @@ export function CoachFormPage() {
         specialization: c.specialization, description: c.description, transformationsCount: String(c.transformationsCount),
         availableSlots: String(c.availableSlots), facebook: c.facebook ?? "", instagram: c.instagram ?? "", linkedin: c.linkedin ?? "",
       });
-      if (c.profilePicture) setPhoto([{ id: "existing", name: "Current photo", sizeLabel: "", previewUrl: c.profilePicture, progress: 100, status: "done" }]);
+      setProfilePictureUrl(c.profilePicture);
+      setCoverPhotoUrl(c.coverPhoto);
       setLoading(false);
     });
   }, [id]);
@@ -91,7 +92,8 @@ export function CoachFormPage() {
         level: Number(form.level) as 1 | 2 | 3 | 4 | 5, specialization: form.specialization, description: form.description,
         availableSlots: Number(form.availableSlots) || 0, status: "Active" as const,
         facebook: form.facebook || null, instagram: form.instagram || null, linkedin: form.linkedin || null,
-        profilePicture: photo[0]?.previewUrl ?? null,
+        profilePicture: profilePictureUrl,
+        coverPhoto: coverPhotoUrl,
       };
       if (isEdit && id) {
         await updateCoach(id, payload);
@@ -120,6 +122,17 @@ export function CoachFormPage() {
       />
 
       <div className={styles.sections}>
+        <GlassCard padding="none" style={{ paddingTop: 20, paddingLeft: 20, paddingRight: 20 }}>
+          <p className="text-title" style={{ marginBottom: 20 }}>Profile & Cover Photo</p>
+          <ProfileHeaderEditor
+            name={`${form.firstName || "New"} ${form.lastName || "Coach"}`}
+            coverUrl={coverPhotoUrl}
+            avatarUrl={profilePictureUrl}
+            onCoverChange={(file) => setCoverPhotoUrl(URL.createObjectURL(file))}
+            onAvatarChange={(file) => setProfilePictureUrl(URL.createObjectURL(file))}
+          />
+        </GlassCard>
+
         <GlassCard>
           <p className="text-title" style={{ marginBottom: 20 }}>Main Info</p>
           <div className={styles.grid}>
@@ -164,17 +177,6 @@ export function CoachFormPage() {
             </Field>
             <Field label="Country">
               <Input value={form.country} onChange={(e) => set("country", e.target.value)} />
-            </Field>
-          </div>
-          <div style={{ marginTop: 16 }}>
-            <Field label="Profile Picture" helperText="JPG, JPEG or PNG only">
-              <FileUploader
-                accept="image/jpeg,image/jpg,image/png"
-                acceptLabel="JPG, JPEG, PNG"
-                files={photo}
-                onAdd={(list) => setPhoto([toUploadedFile(list[0], nextId("photo"))])}
-                onRemove={() => setPhoto([])}
-              />
             </Field>
           </div>
         </GlassCard>

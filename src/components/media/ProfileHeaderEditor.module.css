@@ -1,0 +1,111 @@
+.root {
+  position: relative;
+  margin-bottom: 56px; /* room for the avatar overlapping below the cover */
+}
+
+.cover {
+  height: 180px;
+  width: 100%;
+  border-radius: var(--radius-lg);
+  background-color: var(--glass-fill);
+  background-size: cover;
+  background-position: center;
+  border: 1px solid var(--glass-border);
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color var(--duration-fast) var(--ease-out);
+}
+.cover:hover {
+  border-color: var(--glass-border-bright);
+}
+.cover.readOnly,
+.avatar.readOnly {
+  cursor: default;
+}
+.cover.readOnly:hover {
+  border-color: var(--glass-border);
+}
+.coverEmpty {
+  background-image: linear-gradient(135deg, rgba(255, 122, 0, 0.16), rgba(255, 122, 0, 0.03));
+}
+.coverEmptyHint {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--text-muted);
+  font-size: var(--fs-label);
+}
+
+.coverEditBtn {
+  position: absolute;
+  right: var(--space-3);
+  bottom: var(--space-3);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: var(--radius-md);
+  background: rgba(8, 8, 8, 0.65);
+  backdrop-filter: blur(var(--glass-blur-sm));
+  border: 1px solid var(--glass-border-bright);
+  color: var(--text-primary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-medium);
+  cursor: pointer;
+}
+.coverEditBtn:hover {
+  background: rgba(8, 8, 8, 0.85);
+}
+
+.hiddenInput {
+  display: none;
+}
+
+.avatarWrap {
+  position: absolute;
+  left: var(--space-6);
+  bottom: -48px;
+}
+.avatar {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, rgba(255, 122, 0, 0.35), rgba(255, 122, 0, 0.12));
+  border: 4px solid var(--bg-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.avatarInitials {
+  font-size: 28px;
+  font-weight: var(--fw-bold);
+  color: var(--text-primary);
+}
+.avatarEditBadge {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--ggf-orange);
+  color: var(--text-on-orange);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--bg-base);
+}

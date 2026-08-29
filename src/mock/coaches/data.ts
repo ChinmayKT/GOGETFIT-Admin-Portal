@@ -1,6 +1,7 @@
 import type { Coach, CoachLevel } from "../../types/coach";
 import { CITIES, LANGUAGES, SPECIALIZATIONS, fullName } from "../shared/reference";
 import { pickMany, randomInt, daysAgo } from "../shared/utils";
+import { svgImagePlaceholder } from "../content/placeholder";
 
 function makeCoach(index: number): Coach {
   const { name, gender } = fullName();
@@ -22,6 +23,7 @@ function makeCoach(index: number): Coach {
     state: location.state,
     country: "India",
     profilePicture: null,
+    coverPhoto: svgImagePlaceholder(index, `${firstName} ${lastName}`),
     level,
     specialization: SPECIALIZATIONS[index % SPECIALIZATIONS.length],
     description: `${SPECIALIZATIONS[index % SPECIALIZATIONS.length]} specialist with a client-first coaching style, focused on sustainable results.`,

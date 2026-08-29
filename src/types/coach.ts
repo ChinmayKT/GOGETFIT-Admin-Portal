@@ -13,6 +13,7 @@ export interface Coach {
   state: string;
   country: string;
   profilePicture: string | null;
+  coverPhoto: string | null;
 
   level: CoachLevel;
   specialization: string;

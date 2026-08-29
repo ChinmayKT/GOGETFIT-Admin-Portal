@@ -38,6 +38,9 @@ import { BannerListPage } from "../../features/content/BannerListPage";
 import { BannerFormPage } from "../../features/content/BannerFormPage";
 import { BannerViewPage } from "../../features/content/BannerViewPage";
 import { MediaLibraryPage } from "../../features/content/MediaLibraryPage";
+import { GogetfitPlansPage } from "../../features/content/GogetfitPlansPage";
+import { GogetfitPlanFormPage } from "../../features/content/GogetfitPlanFormPage";
+import { GogetfitPlanViewPage } from "../../features/content/GogetfitPlanViewPage";
 import { ProductListPage } from "../../features/commerce/ProductListPage";
 import { ProductFormPage } from "../../features/commerce/ProductFormPage";
 import { ProductViewPage } from "../../features/commerce/ProductViewPage";
@@ -133,6 +136,10 @@ export const router = createBrowserRouter([
       { path: "content/faqs/:id/edit", element: <FaqFormPage /> },
       { path: "content/quotes", element: <QuotesPage /> },
       { path: "content/media", element: <MediaLibraryPage /> },
+      { path: "content/gogetfit-plans", element: <GogetfitPlansPage /> },
+      { path: "content/gogetfit-plans/new", element: <GogetfitPlanFormPage /> },
+      { path: "content/gogetfit-plans/:id", element: <GogetfitPlanViewPage /> },
+      { path: "content/gogetfit-plans/:id/edit", element: <GogetfitPlanFormPage /> },
 
       { path: "commerce/products", element: <ProductListPage /> },
       { path: "commerce/products/new", element: <ProductFormPage /> },
