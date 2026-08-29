@@ -36,6 +36,15 @@ import { BannerListPage } from "../../features/content/BannerListPage";
 import { BannerFormPage } from "../../features/content/BannerFormPage";
 import { BannerViewPage } from "../../features/content/BannerViewPage";
 import { MediaLibraryPage } from "../../features/content/MediaLibraryPage";
+import { ProductListPage } from "../../features/commerce/ProductListPage";
+import { ProductFormPage } from "../../features/commerce/ProductFormPage";
+import { ProductViewPage } from "../../features/commerce/ProductViewPage";
+import { CouponListPage } from "../../features/commerce/CouponListPage";
+import { CouponFormPage } from "../../features/commerce/CouponFormPage";
+import { PackageListPage } from "../../features/commerce/PackageListPage";
+import { PackageFormPage } from "../../features/commerce/PackageFormPage";
+import { OrderListPage } from "../../features/commerce/OrderListPage";
+import { OrderDetailPage } from "../../features/commerce/OrderDetailPage";
 
 const placeholder = (title: string) => <PlaceholderPage title={title} />;
 
@@ -99,10 +108,18 @@ export const router = createBrowserRouter([
       { path: "content/quotes", element: <QuotesPage /> },
       { path: "content/media", element: <MediaLibraryPage /> },
 
-      { path: "commerce/products", element: placeholder("Products") },
-      { path: "commerce/packages", element: placeholder("Packages") },
-      { path: "commerce/orders", element: placeholder("Orders") },
-      { path: "commerce/coupons", element: placeholder("Coupons") },
+      { path: "commerce/products", element: <ProductListPage /> },
+      { path: "commerce/products/new", element: <ProductFormPage /> },
+      { path: "commerce/products/:id", element: <ProductViewPage /> },
+      { path: "commerce/products/:id/edit", element: <ProductFormPage /> },
+      { path: "commerce/packages", element: <PackageListPage /> },
+      { path: "commerce/packages/new", element: <PackageFormPage /> },
+      { path: "commerce/packages/:id/edit", element: <PackageFormPage /> },
+      { path: "commerce/orders", element: <OrderListPage /> },
+      { path: "commerce/orders/:id", element: <OrderDetailPage /> },
+      { path: "commerce/coupons", element: <CouponListPage /> },
+      { path: "commerce/coupons/new", element: <CouponFormPage /> },
+      { path: "commerce/coupons/:id/edit", element: <CouponFormPage /> },
 
       { path: "operations/notifications", element: placeholder("Notifications") },
       { path: "operations/analytics", element: placeholder("Analytics") },
