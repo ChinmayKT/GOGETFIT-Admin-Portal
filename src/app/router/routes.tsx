@@ -45,6 +45,14 @@ import { PackageListPage } from "../../features/commerce/PackageListPage";
 import { PackageFormPage } from "../../features/commerce/PackageFormPage";
 import { OrderListPage } from "../../features/commerce/OrderListPage";
 import { OrderDetailPage } from "../../features/commerce/OrderDetailPage";
+import { NotificationsPage } from "../../features/operations/NotificationsPage";
+import { AnalyticsPage } from "../../features/operations/AnalyticsPage";
+import { AdminUserListPage } from "../../features/system/AdminUserListPage";
+import { AdminUserFormPage } from "../../features/system/AdminUserFormPage";
+import { PermissionsPage } from "../../features/system/PermissionsPage";
+import { AuditLogsPage } from "../../features/system/AuditLogsPage";
+import { SettingsPage } from "../../features/system/SettingsPage";
+import { FeatureFlagsPage } from "../../features/system/FeatureFlagsPage";
 
 const placeholder = (title: string) => <PlaceholderPage title={title} />;
 
@@ -121,14 +129,16 @@ export const router = createBrowserRouter([
       { path: "commerce/coupons/new", element: <CouponFormPage /> },
       { path: "commerce/coupons/:id/edit", element: <CouponFormPage /> },
 
-      { path: "operations/notifications", element: placeholder("Notifications") },
-      { path: "operations/analytics", element: placeholder("Analytics") },
+      { path: "operations/notifications", element: <NotificationsPage /> },
+      { path: "operations/analytics", element: <AnalyticsPage /> },
 
-      { path: "system/admin-users", element: placeholder("Admin Users") },
-      { path: "system/permissions", element: placeholder("Roles & Permissions") },
-      { path: "system/audit-logs", element: placeholder("Audit Logs") },
-      { path: "system/settings", element: placeholder("Settings") },
-      { path: "system/feature-flags", element: placeholder("Feature Flags") },
+      { path: "system/admin-users", element: <AdminUserListPage /> },
+      { path: "system/admin-users/new", element: <AdminUserFormPage /> },
+      { path: "system/admin-users/:id/edit", element: <AdminUserFormPage /> },
+      { path: "system/permissions", element: <PermissionsPage /> },
+      { path: "system/audit-logs", element: <AuditLogsPage /> },
+      { path: "system/settings", element: <SettingsPage /> },
+      { path: "system/feature-flags", element: <FeatureFlagsPage /> },
 
       { path: "*", element: placeholder("Not Found") },
     ],

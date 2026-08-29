@@ -9,6 +9,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { CHART_SERIES, CHART_GRID, CHART_AXIS_TEXT, tooltipStyle, tooltipLabelStyle } from "./chartTheme";
+import { formatCompactNumber } from "../../utils/format";
 
 interface Series {
   key: string;
@@ -36,7 +37,8 @@ export function LineChart({ data, xKey, series, height = 280, yDomain = "zero" }
           tick={{ fontSize: 11, fill: CHART_AXIS_TEXT }}
           axisLine={false}
           tickLine={false}
-          width={40}
+          width={48}
+          tickFormatter={(v: number) => formatCompactNumber(v)}
         />
         <Tooltip contentStyle={tooltipStyle} labelStyle={tooltipLabelStyle} cursor={{ stroke: CHART_GRID }} />
         {series.length > 1 && <Legend wrapperStyle={{ fontSize: 12, color: CHART_AXIS_TEXT }} iconType="circle" iconSize={8} />}

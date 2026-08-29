@@ -9,6 +9,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { CHART_SERIES, CHART_GRID, CHART_AXIS_TEXT, tooltipStyle, tooltipLabelStyle } from "./chartTheme";
+import { formatCompactNumber } from "../../utils/format";
 
 interface Series {
   key: string;
@@ -28,7 +29,14 @@ export function BarChart({ data, xKey, series, height = 280 }: BarChartProps) {
       <RBarChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: -12 }} barGap={4}>
         <CartesianGrid stroke={CHART_GRID} vertical={false} />
         <XAxis dataKey={xKey} stroke={CHART_AXIS_TEXT} tick={{ fontSize: 11, fill: CHART_AXIS_TEXT }} axisLine={false} tickLine={false} />
-        <YAxis stroke={CHART_AXIS_TEXT} tick={{ fontSize: 11, fill: CHART_AXIS_TEXT }} axisLine={false} tickLine={false} width={40} />
+        <YAxis
+          stroke={CHART_AXIS_TEXT}
+          tick={{ fontSize: 11, fill: CHART_AXIS_TEXT }}
+          axisLine={false}
+          tickLine={false}
+          width={48}
+          tickFormatter={(v: number) => formatCompactNumber(v)}
+        />
         <Tooltip contentStyle={tooltipStyle} labelStyle={tooltipLabelStyle} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
         {series.length > 1 && <Legend wrapperStyle={{ fontSize: 12, color: CHART_AXIS_TEXT }} iconType="circle" iconSize={8} />}
         {series.map((s, i) => (
