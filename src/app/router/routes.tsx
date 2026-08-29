@@ -17,6 +17,16 @@ import { FoodListPage } from "../../features/nutrition/FoodListPage";
 import { FoodFormPage } from "../../features/nutrition/FoodFormPage";
 import { FoodRequestsPage } from "../../features/nutrition/FoodRequestsPage";
 import { FoodLogPage } from "../../features/nutrition/FoodLogPage";
+import { WorkoutListPage } from "../../features/workouts/WorkoutListPage";
+import { WorkoutFormPage } from "../../features/workouts/WorkoutFormPage";
+import { ChallengeListPage } from "../../features/challenges/ChallengeListPage";
+import { ChallengeFormPage } from "../../features/challenges/ChallengeFormPage";
+import { ChallengeDetailPage } from "../../features/challenges/ChallengeDetailPage";
+import { ParticipantsListPage } from "../../features/challenges/ParticipantsListPage";
+import { ParticipantDetailPage } from "../../features/challenges/ParticipantDetailPage";
+import { RewardsPage } from "../../features/rewards/RewardsPage";
+import { TransformationsPage } from "../../features/progress/TransformationsPage";
+import { MeasurementsPage } from "../../features/progress/MeasurementsPage";
 
 const placeholder = (title: string) => <PlaceholderPage title={title} />;
 
@@ -51,20 +61,21 @@ export const router = createBrowserRouter([
       { path: "nutrition/requests", element: <FoodRequestsPage /> },
       { path: "nutrition/log", element: <FoodLogPage /> },
 
-      { path: "fitness/workouts", element: placeholder("Workouts") },
-      { path: "fitness/workouts/new", element: placeholder("Add Workout") },
-      { path: "fitness/workouts/:id/edit", element: placeholder("Edit Workout") },
+      { path: "fitness/workouts", element: <WorkoutListPage /> },
+      { path: "fitness/workouts/new", element: <WorkoutFormPage /> },
+      { path: "fitness/workouts/:id/edit", element: <WorkoutFormPage /> },
 
-      { path: "challenges", element: placeholder("Challenges") },
-      { path: "challenges/new", element: placeholder("Add Challenge") },
-      { path: "challenges/:id", element: placeholder("Challenge Detail") },
-      { path: "challenges/:id/participants", element: placeholder("Challenge Participants") },
-      { path: "challenges/:id/participants/:userId", element: placeholder("Participant Detail") },
+      { path: "challenges", element: <ChallengeListPage /> },
+      { path: "challenges/new", element: <ChallengeFormPage /> },
+      { path: "challenges/:id", element: <ChallengeDetailPage /> },
+      { path: "challenges/:id/edit", element: <ChallengeFormPage /> },
+      { path: "challenges/:id/participants", element: <ParticipantsListPage /> },
+      { path: "challenges/:id/participants/:userId", element: <ParticipantDetailPage /> },
 
-      { path: "rewards", element: placeholder("Rewards") },
+      { path: "rewards", element: <RewardsPage /> },
 
-      { path: "progress/transformations", element: placeholder("Transformations") },
-      { path: "progress/measurements", element: placeholder("Measurements") },
+      { path: "progress/transformations", element: <TransformationsPage /> },
+      { path: "progress/measurements", element: <MeasurementsPage /> },
 
       { path: "content/articles", element: placeholder("Articles") },
       { path: "content/banners", element: placeholder("Banners") },
