@@ -80,6 +80,10 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         )}
       </div>
 
+      <button className={styles.collapseBtn} onClick={onToggle} aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}>
+        {collapsed ? <ChevronsRight size={16} /> : <ChevronsLeft size={16} />}
+      </button>
+
       <nav className={styles.nav}>
         {NAV_GROUPS.map((group) => {
           const visibleItems = group.items.filter((item) => can(item.module as never, "view"));
@@ -105,10 +109,6 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           );
         })}
       </nav>
-
-      <button className={styles.collapseBtn} onClick={onToggle} aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}>
-        {collapsed ? <ChevronsRight size={16} /> : <ChevronsLeft size={16} />}
-      </button>
     </aside>
   );
 }
