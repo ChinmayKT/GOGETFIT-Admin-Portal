@@ -1,0 +1,66 @@
+.scroll {
+  overflow-x: auto;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-label);
+}
+.table thead th {
+  text-align: left;
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--glass-border);
+  white-space: nowrap;
+  background: rgba(255, 255, 255, 0.015);
+}
+.table tbody td {
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid var(--glass-border);
+  vertical-align: middle;
+}
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+.nameCell {
+  min-width: 200px;
+}
+.unitCell {
+  min-width: 130px;
+}
+.numCell {
+  width: 100px;
+}
+.actionsCell {
+  width: 1%;
+  white-space: nowrap;
+}
+.subtotalRow td {
+  padding: var(--space-3) var(--space-4);
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.02);
+  border-top: 1px solid var(--glass-border);
+  border-bottom: none;
+}
+.footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  flex-wrap: wrap;
+}
+.capWarning {
+  color: var(--color-warning);
+  font-size: var(--fs-caption);
+}
+.empty {
+  padding: var(--space-6);
+  text-align: center;
+  color: var(--text-muted);
+  font-size: var(--fs-label);
+}

@@ -11,6 +11,12 @@ import { CoachDetailPage } from "../../features/coaches/CoachDetailPage";
 import { CoachFormPage } from "../../features/coaches/CoachFormPage";
 import { CoachCertificatesPage } from "../../features/coaches/CoachCertificatesPage";
 import { AssignmentsPage } from "../../features/assignments/AssignmentsPage";
+import { DietListPage } from "../../features/nutrition/DietListPage";
+import { DietFormPage } from "../../features/nutrition/DietFormPage";
+import { FoodListPage } from "../../features/nutrition/FoodListPage";
+import { FoodFormPage } from "../../features/nutrition/FoodFormPage";
+import { FoodRequestsPage } from "../../features/nutrition/FoodRequestsPage";
+import { FoodLogPage } from "../../features/nutrition/FoodLogPage";
 
 const placeholder = (title: string) => <PlaceholderPage title={title} />;
 
@@ -36,14 +42,14 @@ export const router = createBrowserRouter([
 
       { path: "assignments", element: <AssignmentsPage /> },
 
-      { path: "nutrition/diets", element: placeholder("Diet Plans") },
-      { path: "nutrition/diets/new", element: placeholder("Add Diet Plan") },
-      { path: "nutrition/diets/:id/edit", element: placeholder("Edit Diet Plan") },
-      { path: "nutrition/foods", element: placeholder("Food Database") },
-      { path: "nutrition/foods/new", element: placeholder("Add Food") },
-      { path: "nutrition/foods/:id/edit", element: placeholder("Edit Food") },
-      { path: "nutrition/requests", element: placeholder("Food Requests") },
-      { path: "nutrition/log", element: placeholder("Food Log") },
+      { path: "nutrition/diets", element: <DietListPage /> },
+      { path: "nutrition/diets/new", element: <DietFormPage /> },
+      { path: "nutrition/diets/:id/edit", element: <DietFormPage /> },
+      { path: "nutrition/foods", element: <FoodListPage /> },
+      { path: "nutrition/foods/new", element: <FoodFormPage /> },
+      { path: "nutrition/foods/:id/edit", element: <FoodFormPage /> },
+      { path: "nutrition/requests", element: <FoodRequestsPage /> },
+      { path: "nutrition/log", element: <FoodLogPage /> },
 
       { path: "fitness/workouts", element: placeholder("Workouts") },
       { path: "fitness/workouts/new", element: placeholder("Add Workout") },
