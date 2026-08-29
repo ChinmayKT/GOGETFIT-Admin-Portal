@@ -1,0 +1,96 @@
+.dropzone {
+  border: 1.5px dashed var(--glass-border-bright);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8) var(--space-5);
+  text-align: center;
+  cursor: pointer;
+  background: var(--glass-fill);
+  transition: background var(--duration-base) var(--ease-out), border-color var(--duration-base) var(--ease-out);
+}
+.dropzone:hover,
+.dragging {
+  background: var(--glass-fill-bright);
+  border-color: var(--ggf-orange);
+}
+.icon {
+  color: var(--ggf-orange);
+  margin-bottom: var(--space-2);
+}
+.title {
+  font-size: var(--fs-label);
+  font-weight: var(--fw-medium);
+}
+.subtitle {
+  font-size: var(--fs-caption);
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+.hiddenInput {
+  display: none;
+}
+.warning {
+  font-size: var(--fs-caption);
+  color: var(--color-warning);
+  margin-top: var(--space-2);
+}
+.fileList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+.fileItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  background: var(--glass-fill);
+}
+.thumb {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+}
+.thumbIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: var(--glass-fill-bright);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+.fileInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.fileName {
+  font-size: var(--fs-label);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.fileSize {
+  font-size: var(--fs-caption);
+  color: var(--text-muted);
+}
+.removeBtn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+.removeBtn:hover {
+  background: var(--color-error-bg);
+  color: var(--color-error);
+}

@@ -1,0 +1,62 @@
+.control {
+  width: 100%;
+  height: 40px;
+  padding: 0 var(--space-3);
+  background: var(--glass-fill);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--fs-body);
+  transition: border-color var(--duration-fast) var(--ease-out), background var(--duration-fast) var(--ease-out);
+}
+.control::placeholder {
+  color: var(--text-disabled);
+}
+.control:hover {
+  border-color: var(--glass-border-bright);
+}
+.control:focus {
+  outline: none;
+  border-color: var(--ggf-orange);
+  background: var(--glass-fill-bright);
+  box-shadow: 0 0 0 3px var(--ggf-orange-dim);
+}
+.control:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.errorState {
+  border-color: var(--color-error-border);
+}
+.errorState:focus {
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 3px var(--color-error-bg);
+}
+
+.textarea {
+  composes: control;
+  height: auto;
+  min-height: 96px;
+  padding: var(--space-3);
+  resize: vertical;
+  font-family: inherit;
+  line-height: var(--lh-body);
+}
+
+.selectWrap {
+  position: relative;
+}
+.select {
+  composes: control;
+  appearance: none;
+  cursor: pointer;
+  padding-right: var(--space-8);
+}
+.selectIcon {
+  position: absolute;
+  right: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--text-muted);
+}

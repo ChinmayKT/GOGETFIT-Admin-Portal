@@ -1,0 +1,50 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  min-height: 140px;
+}
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.label {
+  font-size: var(--fs-label);
+  color: var(--text-secondary);
+  font-weight: var(--fw-medium);
+}
+.icon {
+  color: var(--ggf-orange);
+}
+.valueRow {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+.value {
+  font-size: 2rem;
+}
+.trend {
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+}
+.up {
+  color: var(--color-success);
+}
+.down {
+  color: var(--color-error);
+}
+.flat {
+  color: var(--text-muted);
+}
+.comparison {
+  font-size: var(--fs-caption);
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.sparkline {
+  margin-top: auto;
+  padding-top: var(--space-3);
+  height: 36px;
+}

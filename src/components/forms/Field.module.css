@@ -1,0 +1,21 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.label {
+  font-size: var(--fs-label);
+  font-weight: var(--fw-medium);
+  color: var(--text-secondary);
+}
+.required {
+  color: var(--ggf-orange);
+}
+.helper {
+  font-size: var(--fs-caption);
+  color: var(--text-muted);
+}
+.error {
+  font-size: var(--fs-caption);
+  color: var(--color-error);
+}

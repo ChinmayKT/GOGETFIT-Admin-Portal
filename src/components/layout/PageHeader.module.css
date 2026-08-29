@@ -1,0 +1,26 @@
+.root {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+  flex-wrap: wrap;
+}
+.title {
+  font-size: var(--fs-headline);
+  font-weight: var(--fw-bold);
+  letter-spacing: -0.01em;
+  margin-top: var(--space-1);
+}
+.description {
+  font-size: var(--fs-label);
+  color: var(--text-muted);
+  margin-top: 4px;
+  max-width: 560px;
+}
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-shrink: 0;
+}

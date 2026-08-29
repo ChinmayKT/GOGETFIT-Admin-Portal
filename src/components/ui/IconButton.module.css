@@ -1,0 +1,30 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
+}
+.root:hover {
+  background: var(--glass-fill-bright);
+  color: var(--text-primary);
+}
+.root:active {
+  transform: scale(0.93);
+}
+.md {
+  width: 36px;
+  height: 36px;
+}
+.sm {
+  width: 28px;
+  height: 28px;
+}
+.danger:hover {
+  background: var(--color-error-bg);
+  color: var(--color-error);
+}

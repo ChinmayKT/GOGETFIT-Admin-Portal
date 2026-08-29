@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# local smoke-test scripts (run from repo root during dev to satisfy node module resolution)
+/smoke*.mjs

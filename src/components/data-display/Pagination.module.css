@@ -1,0 +1,22 @@
+.root {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+  border-top: 1px solid var(--glass-border);
+}
+.summary {
+  font-size: var(--fs-caption);
+  color: var(--text-muted);
+}
+.controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.pageLabel {
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+  min-width: 100px;
+  text-align: center;
+}
