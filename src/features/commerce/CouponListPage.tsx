@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Eye, Pencil, Trash2 } from "lucide-react";
 import { PageHeader } from "../../components/layout/PageHeader";
 import { FilterBar } from "../../components/data-display/FilterBar";
 import { SearchInput } from "../../components/data-display/SearchInput";
@@ -100,6 +100,7 @@ export function CouponListPage() {
         }
         rowActions={(c) => (
           <div style={{ display: "flex", gap: 4 }}>
+            <IconButton icon={<Eye size={15} />} label="View" size="sm" onClick={() => navigate(`/commerce/coupons/${c.id}`)} />
             <IconButton icon={<Pencil size={15} />} label="Edit" size="sm" onClick={() => navigate(`/commerce/coupons/${c.id}/edit`)} />
             <IconButton icon={<Trash2 size={15} />} label="Delete" size="sm" variant="danger" onClick={() => setDeleteTarget(c)} />
           </div>

@@ -41,6 +41,7 @@ import { ProductFormPage } from "../../features/commerce/ProductFormPage";
 import { ProductViewPage } from "../../features/commerce/ProductViewPage";
 import { CouponListPage } from "../../features/commerce/CouponListPage";
 import { CouponFormPage } from "../../features/commerce/CouponFormPage";
+import { CouponViewPage } from "../../features/commerce/CouponViewPage";
 import { PackageListPage } from "../../features/commerce/PackageListPage";
 import { PackageFormPage } from "../../features/commerce/PackageFormPage";
 import { OrderListPage } from "../../features/commerce/OrderListPage";
@@ -127,6 +128,7 @@ export const router = createBrowserRouter([
       { path: "commerce/orders/:id", element: <OrderDetailPage /> },
       { path: "commerce/coupons", element: <CouponListPage /> },
       { path: "commerce/coupons/new", element: <CouponFormPage /> },
+      { path: "commerce/coupons/:id", element: <CouponViewPage /> },
       { path: "commerce/coupons/:id/edit", element: <CouponFormPage /> },
 
       { path: "operations/notifications", element: <NotificationsPage /> },
