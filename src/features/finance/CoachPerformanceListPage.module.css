@@ -1,0 +1,241 @@
+.searchRow {
+  margin-bottom: var(--space-5);
+}
+
+.sectionHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: var(--space-4);
+}
+.sectionTitle {
+  font-size: var(--fs-title);
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+}
+.sectionCaption {
+  font-size: var(--fs-caption);
+  color: var(--text-muted);
+}
+
+.filterChips {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+  flex-wrap: wrap;
+}
+.chip {
+  padding: 7px 14px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-fill);
+  color: var(--text-secondary);
+  font-size: var(--fs-label);
+  font-weight: var(--fw-medium);
+  cursor: pointer;
+  transition: background var(--duration-base) var(--ease-out), border-color var(--duration-base) var(--ease-out), color var(--duration-base) var(--ease-out);
+  white-space: nowrap;
+}
+.chip:hover {
+  background: var(--glass-fill-hover);
+  color: var(--text-primary);
+}
+.chipActive,
+.chipActive:hover {
+  background: var(--ggf-orange-dim);
+  border-color: rgba(255, 122, 0, 0.4);
+  color: var(--ggf-orange);
+}
+
+.topSortRow {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--space-4);
+}
+.topSortRow :global(.selectWrap) {
+  min-width: 220px;
+}
+
+/* ---- Leaderboard shared ---- */
+.surface {
+  overflow-x: auto;
+}
+.leaderboard {
+  min-width: 880px;
+}
+.headerRow,
+.row {
+  display: grid;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+}
+.headerRow {
+  border-bottom: 1px solid var(--glass-border);
+}
+.headerRow span {
+  font-size: var(--fs-caption);
+  color: var(--text-muted);
+  font-weight: var(--fw-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.row {
+  border-bottom: 1px solid var(--glass-border);
+  cursor: pointer;
+  transition: background var(--duration-base) var(--ease-out);
+}
+.row:last-child {
+  border-bottom: none;
+}
+.row:hover {
+  background: var(--glass-fill-hover);
+}
+
+/* Revenue performance tab grid */
+.gridRevenue {
+  grid-template-columns: 56px minmax(200px, 1.5fr) 90px 90px 90px 120px 110px 90px 130px;
+}
+/* Client load tab grid */
+.gridLoad {
+  grid-template-columns: minmax(200px, 1.5fr) 100px 100px minmax(140px, 1fr) 130px;
+}
+/* Top performing tab grid */
+.gridTop {
+  grid-template-columns: 56px minmax(200px, 1.3fr) minmax(220px, 1.3fr) 90px;
+}
+
+.colNum {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary);
+}
+
+.coachCell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.coachName {
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+}
+
+.topRow {
+  background: var(--glass-fill-bright);
+}
+.rank1 {
+  background: linear-gradient(90deg, rgba(255, 215, 0, 0.08), var(--glass-fill-bright) 60%);
+}
+.rank2 {
+  background: linear-gradient(90deg, rgba(192, 192, 192, 0.08), var(--glass-fill-bright) 60%);
+}
+.rank3 {
+  background: linear-gradient(90deg, rgba(205, 127, 50, 0.08), var(--glass-fill-bright) 60%);
+}
+
+.rankBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--glass-fill-bright);
+  color: var(--text-secondary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-bold);
+}
+.gold {
+  background: linear-gradient(155deg, #ffe27a, #d9a441);
+  color: #402c00;
+  box-shadow: 0 0 0 1px rgba(255, 215, 0, 0.35);
+}
+.silver {
+  background: linear-gradient(155deg, #f1f1f1, #b7bcc4);
+  color: #2b2f34;
+  box-shadow: 0 0 0 1px rgba(200, 200, 200, 0.35);
+}
+.bronze {
+  background: linear-gradient(155deg, #e3a370, #ab6b34);
+  color: #351f08;
+  box-shadow: 0 0 0 1px rgba(205, 127, 50, 0.35);
+}
+
+.medal {
+  font-size: 20px;
+  line-height: 1;
+}
+
+/* Utilization progress bar */
+.progressTrack {
+  position: relative;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--glass-fill-bright);
+  overflow: hidden;
+}
+.progressFill {
+  position: absolute;
+  inset: 0;
+  width: var(--fill, 0%);
+  border-radius: var(--radius-full);
+  background: var(--ggf-orange);
+}
+.progressFill.low {
+  background: var(--color-info);
+}
+.progressFill.high {
+  background: var(--color-warning);
+}
+.progressMeta {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-size: var(--fs-caption);
+  color: var(--text-muted);
+}
+
+/* Breakdown mini bars (Top Performing tab) */
+.breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.breakdownRow {
+  display: grid;
+  grid-template-columns: 26px 1fr 28px;
+  align-items: center;
+  gap: 6px;
+}
+.breakdownLabel {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: var(--fw-semibold);
+}
+.breakdownTrack {
+  height: 5px;
+  border-radius: var(--radius-full);
+  background: var(--glass-fill-bright);
+  overflow: hidden;
+}
+.breakdownFill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  width: var(--fill, 0%);
+}
+.breakdownValue {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.scoreCell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-title);
+  color: var(--text-primary);
+}

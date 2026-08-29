@@ -1,0 +1,206 @@
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--space-5);
+  margin-bottom: var(--space-6);
+}
+@media (max-width: 1400px) {
+  .kpiGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 700px) {
+  .kpiGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.midGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-5);
+  margin-bottom: var(--space-6);
+}
+@media (max-width: 1100px) {
+  .midGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.trendHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.rangeGroup {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border-radius: var(--radius-md);
+  background: var(--glass-fill);
+  border: 1px solid var(--glass-border);
+}
+.rangeBtn {
+  padding: 6px 12px;
+  border-radius: calc(var(--radius-md) - 3px);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-medium);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+}
+.rangeBtn:hover {
+  color: var(--text-primary);
+}
+.rangeBtnActive {
+  background: var(--ggf-orange);
+  color: var(--text-on-orange);
+}
+.rangeBtnActive:hover {
+  color: var(--text-on-orange);
+}
+
+.packageList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.packageRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.packageRank {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--glass-fill-bright);
+  color: var(--text-muted);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+}
+.packageInfo {
+  flex: 1;
+  min-width: 0;
+}
+.packageTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: 6px;
+}
+.packageName {
+  font-size: var(--fs-label);
+  color: var(--text-primary);
+  font-weight: var(--fw-medium);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.packageBarTrack {
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--glass-fill-bright);
+  overflow: hidden;
+}
+.packageBarFill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--ggf-orange);
+}
+
+.healthHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+.healthGrid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--space-4);
+}
+@media (max-width: 1200px) {
+  .healthGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 600px) {
+  .healthGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+.healthStat {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--glass-fill);
+  border: 1px solid var(--glass-border);
+}
+.healthStatLabel {
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+}
+.healthStatValue {
+  font-size: 1.25rem;
+}
+
+.insightList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.insightRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--fs-label);
+  color: var(--text-primary);
+}
+.insightClickable {
+  cursor: pointer;
+}
+.insightClickable:hover {
+  background: var(--glass-fill-bright);
+}
+.insightIcon {
+  flex-shrink: 0;
+  display: flex;
+}
+.insightRow.warning .insightIcon {
+  color: var(--color-warning);
+}
+.insightRow.success .insightIcon {
+  color: var(--color-success);
+}
+.insightRow.info .insightIcon {
+  color: var(--color-info);
+}
+.insightMessage {
+  flex: 1;
+}
+.insightAction {
+  flex-shrink: 0;
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-medium);
+  color: var(--ggf-orange);
+  white-space: nowrap;
+}

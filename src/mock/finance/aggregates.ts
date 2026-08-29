@@ -196,13 +196,31 @@ export function coachFunnel(coachId: string): CoachFunnelStage[] {
   const clients = MOCK_CLIENTS.filter((c) => c.coachId === coachId);
   const clientIds = new Set(clients.map((c) => c.userId));
   const enrolled = clients.length;
-  const failedOrPending = MOCK_PAYMENTS.filter(
-    (p) => p.kind === "Enrollment" && clientIds.has(p.clientId) && (p.status === "Pending" || p.status === "Failed"),
-  ).length;
-  const started = Math.max(0, enrolled - failedOrPending);
-  const active = clients.filter((c) => c.status === "Active").length;
-  const renewed = new Set(MOCK_PAYMENTS.filter((p) => p.kind === "Renewal" && clientIds.has(p.clientId) && p.status !== "Failed").map((p) => p.clientId)).size;
-  const completed = clients.filter((c) => c.status === "Expired").length;
+
+  const failedOrPendingIds = new Set(
+    MOCK_PAYMENTS.filter((p) => p.kind === "Enrollment" && clientIds.has(p.clientId) && (p.status === "Pending" || p.status === "Failed")).map(
+      (p) => p.clientId,
+    ),
+  );
+  const startedClients = clients.filter((c) => !failedOrPendingIds.has(c.userId));
+  const started = startedClients.length;
+
+  // Each stage below is a lifecycle MILESTONE ("did this client ever reach X"),
+  // not a current-snapshot state — so each one is a strict SUBSET of the previous
+  // one and the funnel can never widen. A client who renewed and later expired
+  // still counts under "Active" and "Renewed"; only clients who dropped before
+  // ever being genuinely active (Cancelled) are excluded from every stage after Started.
+  const activeClients = startedClients.filter((c) => c.status !== "Cancelled");
+  const active = activeClients.length;
+
+  const renewedPaymentIds = new Set(
+    MOCK_PAYMENTS.filter((p) => p.kind === "Renewal" && p.status !== "Failed").map((p) => p.clientId),
+  );
+  const renewedClients = activeClients.filter((c) => renewedPaymentIds.has(c.userId));
+  const renewed = renewedClients.length;
+
+  const completed = renewedClients.filter((c) => c.status === "Expired").length;
+
   const leadFactor = 0.55 + (Math.abs(coachId.length * 7) % 20) / 100;
   const leads = Math.max(enrolled, Math.round(enrolled / leadFactor));
 

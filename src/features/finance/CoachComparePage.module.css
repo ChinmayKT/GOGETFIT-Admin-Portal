@@ -1,0 +1,81 @@
+.pickerRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+@media (max-width: 900px) {
+  .pickerRow {
+    grid-template-columns: 1fr;
+  }
+}
+.pickerSlot {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.pickerLabel {
+  font-size: var(--fs-caption);
+  color: var(--text-muted);
+  font-weight: var(--fw-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.compareTableWrap {
+  overflow-x: auto;
+  margin-bottom: var(--space-6);
+}
+.compareTable {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 560px;
+}
+.compareTable th,
+.compareTable td {
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  border-bottom: 1px solid var(--glass-border);
+}
+.compareTable th:first-child,
+.compareTable td:first-child {
+  color: var(--text-muted);
+  font-size: var(--fs-label);
+  white-space: nowrap;
+}
+.compareTable td:not(:first-child),
+.compareTable th:not(:first-child) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.coachHeaderCell {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.coachHeaderName {
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+.bestValue {
+  color: var(--ggf-orange);
+  font-weight: var(--fw-bold);
+}
+
+.chartGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-5);
+}
+@media (max-width: 900px) {
+  .chartGrid {
+    grid-template-columns: 1fr;
+  }
+}
+.cardTitle {
+  font-size: var(--fs-title);
+  font-weight: var(--fw-semibold);
+  margin-bottom: var(--space-4);
+}

@@ -46,8 +46,18 @@ import { PackageListPage } from "../../features/commerce/PackageListPage";
 import { PackageFormPage } from "../../features/commerce/PackageFormPage";
 import { OrderListPage } from "../../features/commerce/OrderListPage";
 import { OrderDetailPage } from "../../features/commerce/OrderDetailPage";
+import { PaymentListPage } from "../../features/finance/PaymentListPage";
+import { PaymentDetailPage } from "../../features/finance/PaymentDetailPage";
+import { TransactionListPage } from "../../features/finance/TransactionListPage";
+import { RefundListPage } from "../../features/finance/RefundListPage";
 import { NotificationsPage } from "../../features/operations/NotificationsPage";
 import { AnalyticsPage } from "../../features/operations/AnalyticsPage";
+import { FinanceOverviewPage } from "../../features/finance/FinanceOverviewPage";
+import { RevenueAnalyticsPage } from "../../features/finance/RevenueAnalyticsPage";
+import { SubscriptionsPage } from "../../features/finance/SubscriptionsPage";
+import { CoachPerformanceListPage } from "../../features/finance/CoachPerformanceListPage";
+import { CoachFinanceDetailPage } from "../../features/finance/CoachFinanceDetailPage";
+import { CoachComparePage } from "../../features/finance/CoachComparePage";
 import { AdminUserListPage } from "../../features/system/AdminUserListPage";
 import { AdminUserFormPage } from "../../features/system/AdminUserFormPage";
 import { PermissionsPage } from "../../features/system/PermissionsPage";
@@ -134,16 +144,16 @@ export const router = createBrowserRouter([
       { path: "operations/notifications", element: <NotificationsPage /> },
       { path: "operations/analytics", element: <AnalyticsPage /> },
 
-      { path: "finance", element: placeholder("Finance Overview") },
-      { path: "finance/payments", element: placeholder("Payments") },
-      { path: "finance/payments/:id", element: placeholder("Payment Detail") },
-      { path: "finance/transactions", element: placeholder("Transactions") },
-      { path: "finance/refunds", element: placeholder("Refunds") },
-      { path: "finance/revenue", element: placeholder("Revenue Analytics") },
-      { path: "finance/subscriptions", element: placeholder("Subscriptions") },
-      { path: "finance/coaches", element: placeholder("Coach Performance") },
-      { path: "finance/coaches/:id", element: placeholder("Coach Financial Detail") },
-      { path: "finance/coaches/compare", element: placeholder("Compare Coaches") },
+      { path: "finance", element: <FinanceOverviewPage /> },
+      { path: "finance/payments", element: <PaymentListPage /> },
+      { path: "finance/payments/:id", element: <PaymentDetailPage /> },
+      { path: "finance/transactions", element: <TransactionListPage /> },
+      { path: "finance/refunds", element: <RefundListPage /> },
+      { path: "finance/revenue", element: <RevenueAnalyticsPage /> },
+      { path: "finance/subscriptions", element: <SubscriptionsPage /> },
+      { path: "finance/coaches", element: <CoachPerformanceListPage /> },
+      { path: "finance/coaches/compare", element: <CoachComparePage /> },
+      { path: "finance/coaches/:id", element: <CoachFinanceDetailPage /> },
 
       { path: "system/admin-users", element: <AdminUserListPage /> },
       { path: "system/admin-users/new", element: <AdminUserFormPage /> },
