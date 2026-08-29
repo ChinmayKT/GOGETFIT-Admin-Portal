@@ -13,6 +13,7 @@ export type ModuleKey =
   | "commerce"
   | "operations"
   | "analytics"
+  | "finance"
   | "system";
 
 export type PermissionMatrix = Record<ModuleKey, PermissionAction[]>;

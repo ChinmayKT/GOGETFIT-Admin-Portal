@@ -134,6 +134,17 @@ export const router = createBrowserRouter([
       { path: "operations/notifications", element: <NotificationsPage /> },
       { path: "operations/analytics", element: <AnalyticsPage /> },
 
+      { path: "finance", element: placeholder("Finance Overview") },
+      { path: "finance/payments", element: placeholder("Payments") },
+      { path: "finance/payments/:id", element: placeholder("Payment Detail") },
+      { path: "finance/transactions", element: placeholder("Transactions") },
+      { path: "finance/refunds", element: placeholder("Refunds") },
+      { path: "finance/revenue", element: placeholder("Revenue Analytics") },
+      { path: "finance/subscriptions", element: placeholder("Subscriptions") },
+      { path: "finance/coaches", element: placeholder("Coach Performance") },
+      { path: "finance/coaches/:id", element: placeholder("Coach Financial Detail") },
+      { path: "finance/coaches/compare", element: placeholder("Compare Coaches") },
+
       { path: "system/admin-users", element: <AdminUserListPage /> },
       { path: "system/admin-users/new", element: <AdminUserFormPage /> },
       { path: "system/admin-users/:id/edit", element: <AdminUserFormPage /> },

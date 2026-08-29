@@ -19,6 +19,7 @@ function matrix(overrides: Partial<Record<ModuleKey, PermissionAction[]>>): Role
     commerce: NONE,
     operations: NONE,
     analytics: NONE,
+    finance: NONE,
     system: NONE,
   };
   return { ...base, ...overrides };
@@ -32,7 +33,7 @@ export const ROLES: Role[] = [
     isSystemDefault: true,
     permissions: matrix({
       users: ALL, coaches: ALL, nutrition: ALL, workouts: ALL, challenges: ALL, rewards: ALL,
-      progress: ALL, content: ALL, commerce: ALL, operations: ALL, analytics: ALL, system: ALL,
+      progress: ALL, content: ALL, commerce: ALL, operations: ALL, analytics: ALL, finance: ALL, system: ALL,
     }),
   },
   {
@@ -41,7 +42,7 @@ export const ROLES: Role[] = [
     description: "Runs day-to-day operations across people, commerce and support workflows.",
     permissions: matrix({
       users: CRUD, coaches: CRUD, nutrition: VIEW_ONLY, workouts: VIEW_ONLY, challenges: CRUD,
-      rewards: CRUD, progress: CRUD, commerce: CRUD, operations: ALL, analytics: VIEW_ONLY,
+      rewards: CRUD, progress: CRUD, commerce: CRUD, operations: ALL, analytics: VIEW_ONLY, finance: VIEW_ONLY,
     }),
   },
   {
@@ -84,7 +85,7 @@ export const ROLES: Role[] = [
     id: "role_analyst",
     name: "Analyst",
     description: "Read-only access to analytics and reporting across the business.",
-    permissions: matrix({ analytics: VIEW_ONLY, users: VIEW_ONLY, commerce: VIEW_ONLY, coaches: VIEW_ONLY }),
+    permissions: matrix({ analytics: VIEW_ONLY, users: VIEW_ONLY, commerce: VIEW_ONLY, coaches: VIEW_ONLY, finance: VIEW_ONLY }),
   },
 ];
 

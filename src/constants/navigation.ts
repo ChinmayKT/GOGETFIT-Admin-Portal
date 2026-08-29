@@ -69,6 +69,18 @@ export const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
+    label: "Finance 🔒",
+    items: [
+      { label: "Overview", path: "/finance", module: "finance" },
+      { label: "Payments", path: "/finance/payments", module: "finance" },
+      { label: "Transactions", path: "/finance/transactions", module: "finance" },
+      { label: "Refunds", path: "/finance/refunds", module: "finance" },
+      { label: "Revenue", path: "/finance/revenue", module: "finance" },
+      { label: "Subscriptions", path: "/finance/subscriptions", module: "finance" },
+      { label: "Coach Performance", path: "/finance/coaches", module: "finance" },
+    ],
+  },
+  {
     label: "System",
     items: [
       { label: "Admin Users", path: "/system/admin-users", module: "system" },

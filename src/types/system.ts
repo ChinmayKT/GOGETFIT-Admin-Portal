@@ -15,6 +15,7 @@ export const MODULE_KEYS: ModuleKey[] = [
   "commerce",
   "operations",
   "analytics",
+  "finance",
   "system",
 ];
 
@@ -31,6 +32,7 @@ export const MODULE_LABELS: Record<ModuleKey, string> = {
   commerce: "Commerce",
   operations: "Operations",
   analytics: "Analytics",
+  finance: "Finance",
   system: "System",
 };
 

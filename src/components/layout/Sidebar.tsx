@@ -4,6 +4,7 @@ import {
   Dumbbell, Trophy, Gift, Sparkles, Ruler, FileText, Image, HelpCircle, Quote, Folder,
   Package, Boxes, ShoppingCart, Ticket, Bell, BarChart3, UserCog, ShieldCheck, History,
   Settings, ToggleLeft, ChevronsLeft, ChevronsRight,
+  Wallet, CreditCard, ArrowLeftRight, RotateCcw, TrendingUp, RefreshCw, Crown,
 } from "lucide-react";
 import { GoGetFitMark } from "./GoGetFitMark";
 import { NAV_GROUPS } from "../../constants/navigation";
@@ -37,6 +38,13 @@ const ICONS: Record<string, typeof LayoutDashboard> = {
   "/commerce/coupons": Ticket,
   "/operations/notifications": Bell,
   "/operations/analytics": BarChart3,
+  "/finance": Wallet,
+  "/finance/payments": CreditCard,
+  "/finance/transactions": ArrowLeftRight,
+  "/finance/refunds": RotateCcw,
+  "/finance/revenue": TrendingUp,
+  "/finance/subscriptions": RefreshCw,
+  "/finance/coaches": Crown,
   "/system/admin-users": UserCog,
   "/system/permissions": ShieldCheck,
   "/system/audit-logs": History,
