@@ -7,6 +7,7 @@ import {
   Wallet, CreditCard, ArrowLeftRight, RotateCcw, TrendingUp, RefreshCw, Crown,
 } from "lucide-react";
 import { GoGetFitMark } from "./GoGetFitMark";
+import logo from "../../assets/brand/gogetfit-logo-dark.jpeg";
 import { NAV_GROUPS } from "../../constants/navigation";
 import { useRole } from "../../app/providers/RoleProvider";
 import { cn } from "../../utils/cn";
@@ -63,14 +64,19 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   return (
     <aside className={cn(styles.root, collapsed && styles.collapsed)}>
       <div className={styles.brand}>
-        <span className={styles.brandMark}>
-          <GoGetFitMark size={18} color="#0a0500" />
-        </span>
-        {!collapsed && (
-          <span className={styles.brandText}>
-            GOGETFIT
-            <small>ADMIN PORTAL</small>
+        {collapsed ? (
+          <span className={styles.brandMark}>
+            <GoGetFitMark size={18} color="#0a0500" />
           </span>
+        ) : (
+          <>
+            <span className={styles.logoChip}>
+              <img src={logo} alt="GoGetFit" className={styles.logoImg} />
+            </span>
+            <span className={styles.brandText}>
+              <small>ADMIN PORTAL</small>
+            </span>
+          </>
         )}
       </div>
 
