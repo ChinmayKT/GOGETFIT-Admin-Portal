@@ -1,76 +1,94 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Pencil } from "lucide-react";
+import { PageHeader } from "../../components/layout/PageHeader";
 import { GlassCard } from "../../components/ui/GlassCard";
 import { Button } from "../../components/ui/Button";
-import { StatusBadge, type StatusTone } from "../../components/ui/StatusBadge";
+import { StatusBadge } from "../../components/ui/StatusBadge";
 import { SkeletonProfile } from "../../components/feedback/Skeleton";
 import { ErrorState } from "../../components/feedback/ErrorState";
-import { EmptyState } from "../../components/feedback/EmptyState";
-import { getCoupon } from "../../mock/commerce/couponRepository";
-import { formatDate } from "../../utils/format";
-import type { Coupon } from "../../types/commerce";
-import styles from "../users/UserFormPage.module.css";
-
-const AUDIENCE_TONE: Record<string, StatusTone> = { Everyone: "info", "Specific Users": "warning" };
+import { ApiError } from "../../api/client";
+import { getCoupon } from "../../api/coupons";
+import { formatDateTime } from "../../utils/format";
+import { adminName, couponDay, type Coupon } from "../../types/coupons";
+import styles from "../users/UserDetailPage.module.css";
 
 export function CouponViewPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [coupon, setCoupon] = useState<Coupon | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [state, setState] = useState<"loading" | "ready" | "notFound" | "error">("loading");
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     if (!id) return;
-    setLoading(true);
-    getCoupon(id).then((c) => setCoupon(c ?? null)).catch(() => setError(true)).finally(() => setLoading(false));
-  }, [id]);
+    let stale = false;
+    setState("loading");
+    getCoupon(id)
+      .then((c) => {
+        if (stale) return;
+        setCoupon(c);
+        setState("ready");
+      })
+      .catch((cause) => !stale && setState(cause instanceof ApiError && cause.status === 404 ? "notFound" : "error"));
+    return () => {
+      stale = true;
+    };
+  }, [id, attempt]);
 
-  if (loading) return <GlassCard><SkeletonProfile /></GlassCard>;
-  if (error) return <ErrorState onRetry={() => window.location.reload()} />;
-  if (!coupon) return <EmptyState title="Coupon not found" />;
+  const back = (
+    <button className={styles.backLink} onClick={() => navigate("/commerce/coupons")}>
+      <ArrowLeft size={14} /> Back to Coupons
+    </button>
+  );
 
+  if (state === "loading") return <GlassCard><SkeletonProfile /></GlassCard>;
+  if (state === "notFound") return <>{back}<ErrorState title="Coupon not found" description="This coupon does not exist." /></>;
+  if (state === "error" || !coupon) return <>{back}<ErrorState description="We couldn't load this coupon." onRetry={() => setAttempt((n) => n + 1)} /></>;
+
+  const active = coupon.status === "active";
   return (
     <>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-        <button className={styles.backLink} onClick={() => navigate("/commerce/coupons")} style={{ marginBottom: 0 }}>
-          <ArrowLeft size={14} /> Back to List
-        </button>
-        <Button variant="primary" icon={<Pencil size={15} />} onClick={() => navigate(`/commerce/coupons/${coupon.id}/edit`)}>
-          Edit
-        </Button>
+      <div className={styles.topRow}>
+        {back}
+        <Button variant="primary" icon={<Pencil size={15} />} onClick={() => navigate(`/commerce/coupons/${coupon.id}/edit`)}>Edit Coupon</Button>
       </div>
 
+      <PageHeader title={coupon.code} breadcrumb={[{ label: "Commerce", path: "/commerce/coupons" }, { label: "Coupons", path: "/commerce/coupons" }, { label: coupon.code }]} />
+
       <GlassCard>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-          <h1 className="text-title" style={{ fontSize: "var(--fs-headline)" }}>{coupon.name}</h1>
-          <StatusBadge label={coupon.audience} tone={AUDIENCE_TONE[coupon.audience]} />
+        <div className={styles.metaRow} style={{ marginBottom: 8 }}>
+          <StatusBadge label={active ? "Active" : "Inactive"} tone={active ? "success" : "neutral"} />
+          <StatusBadge label={coupon.visibility === "public" ? "Visible to All: Yes" : "Visible to All: No"} tone={coupon.visibility === "public" ? "info" : "neutral"} dot={false} />
         </div>
-
-        <div className={styles.grid}>
-          <Row label="Coupon Code" value={coupon.code} />
-          <Row label="Discount" value={`${coupon.discountPercent}%`} />
-          <Row label="Valid From" value={formatDate(coupon.validFrom)} />
-          <Row label="Valid To" value={formatDate(coupon.validTo)} />
-          <Row label="Audience" value={coupon.audience} />
+        <p className="text-caption" style={{ marginBottom: 6 }}>
+          Status is automatically determined by the validity dates.
+        </p>
+        <p className="text-caption" style={{ marginBottom: 20 }}>
+          {coupon.visibility === "public"
+            ? "Visible to All: Yes — this coupon appears in the general checkout coupon list."
+            : "Visible to All: No — this coupon is hidden from the general checkout list, but can still be used by entering the exact code while it is valid."}
+        </p>
+        <div className={styles.statGrid}>
+          <Stat label="Discount" value={`${coupon.discount.value}%`} />
+          <Stat label="Valid From" value={couponDay(coupon.validFrom)} />
+          <Stat label="Valid To" value={couponDay(coupon.validTo)} />
+          <Stat label="Description" value={coupon.description ?? "—"} />
+          <Stat label="Created By" value={adminName(coupon.createdBy)} />
+          <Stat label="Created At" value={coupon.createdAt ? formatDateTime(coupon.createdAt) : "—"} />
+          <Stat label="Updated By" value={adminName(coupon.updatedBy)} />
+          <Stat label="Updated At" value={coupon.updatedAt ? formatDateTime(coupon.updatedAt) : "—"} />
         </div>
-
-        {coupon.audience === "Specific Users" && (
-          <div style={{ marginTop: 8 }}>
-            <Row label="Applicable User IDs" value={coupon.userIds.length ? coupon.userIds.join(", ") : "—"} />
-          </div>
-        )}
       </GlassCard>
     </>
   );
 }
 
-function Row({ label, value }: { label: string; value: string }) {
+function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div style={{ marginBottom: 14 }}>
-      <div className="text-caption" style={{ marginBottom: 4 }}>{label}</div>
-      <div className="text-secondary" style={{ lineHeight: 1.6 }}>{value}</div>
+    <div className={styles.stat}>
+      <span className={styles.statLabel}>{label}</span>
+      <span className={styles.statValue}>{value}</span>
     </div>
   );
 }

@@ -101,6 +101,7 @@ export function ProductListPage() {
       </FilterBar>
 
       <DataTable
+          rowOffset={(page - 1) * pageSize}
         columns={columns}
         rows={rows}
         getRowId={(p) => p.id}

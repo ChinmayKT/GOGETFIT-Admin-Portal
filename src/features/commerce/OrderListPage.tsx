@@ -58,6 +58,7 @@ export function OrderListPage() {
       </FilterBar>
 
       <DataTable
+          rowOffset={(page - 1) * pageSize}
         columns={columns}
         rows={rows}
         getRowId={(o) => o.id}
