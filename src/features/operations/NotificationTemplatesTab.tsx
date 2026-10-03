@@ -85,6 +85,7 @@ export function NotificationTemplatesTab() {
       </FilterBar>
 
       <DataTable
+          rowOffset={(page - 1) * pageSize}
         columns={columns}
         rows={rows}
         getRowId={(t) => t.id}

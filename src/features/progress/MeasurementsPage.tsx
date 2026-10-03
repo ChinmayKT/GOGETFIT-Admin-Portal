@@ -42,6 +42,7 @@ export function MeasurementsPage() {
       </FilterBar>
 
       <DataTable
+          rowOffset={(page - 1) * pageSize}
         columns={columns}
         rows={rows}
         getRowId={(u) => u.userId}

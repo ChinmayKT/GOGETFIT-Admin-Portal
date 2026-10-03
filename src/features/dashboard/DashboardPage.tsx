@@ -25,7 +25,7 @@ const ORDER_STATUS_TONE: Record<string, StatusTone> = { Booked: "info", Sent: "w
 const QUICK_ACTIONS = [
   { label: "Add User", icon: Users, path: "/users/new" },
   { label: "Add Coach", icon: Award, path: "/coaches/new" },
-  { label: "Create Diet Plan", icon: Utensils, path: "/nutrition/diets/new" },
+  { label: "Create Diet Plan", icon: Utensils, path: "/nutrition/freediets/new" },
   { label: "Create Workout", icon: Dumbbell, path: "/fitness/workouts/new" },
   { label: "Add Challenge", icon: Trophy, path: "/challenges/new" },
   { label: "Add Banner", icon: ImageIcon, path: "/content/banners" },

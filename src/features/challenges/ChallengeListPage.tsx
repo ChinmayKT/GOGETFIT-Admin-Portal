@@ -106,6 +106,7 @@ export function ChallengeListPage() {
       </FilterBar>
 
       <DataTable
+          rowOffset={(page - 1) * pageSize}
         columns={columns}
         rows={rows}
         getRowId={(c) => c.id}

@@ -90,6 +90,7 @@ export function CoachComparePage() {
             <table className={styles.compareTable}>
               <thead>
                 <tr>
+                  <th style={{ width: 64, textAlign: "center", color: "var(--text-muted)" }}>SL NO</th>
                   <th>Metric</th>
                   {selected.map((c) => (
                     <th key={c.coachId}>
@@ -102,11 +103,12 @@ export function CoachComparePage() {
                 </tr>
               </thead>
               <tbody>
-                {METRICS.map((metric) => {
+                {METRICS.map((metric, index) => {
                   const values = selected.map((c) => metric.value(c));
                   const best = Math.max(...values);
                   return (
                     <tr key={metric.key}>
+                      <td style={{ textAlign: "center", color: "var(--text-muted)" }}>{index + 1}</td>
                       <td>{metric.label}</td>
                       {selected.map((c) => (
                         <td key={c.coachId} className={cn(values.length > 1 && metric.value(c) === best && styles.bestValue)}>

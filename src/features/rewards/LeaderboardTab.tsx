@@ -52,6 +52,7 @@ export function LeaderboardTab({ refreshKey }: Props) {
       </FilterBar>
 
       <DataTable
+          rowOffset={(page - 1) * pageSize}
         columns={columns}
         rows={rows}
         getRowId={(e) => e.userId}

@@ -51,6 +51,7 @@ export function NotificationFailedTab({ refreshKey, onChanged }: { refreshKey: n
       </FilterBar>
 
       <DataTable
+          rowOffset={(page - 1) * pageSize}
         columns={columns}
         rows={rows}
         getRowId={(c) => c.id}

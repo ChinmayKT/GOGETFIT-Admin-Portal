@@ -54,6 +54,7 @@ export function NotificationScheduledTab({ refreshKey, onChanged }: { refreshKey
       </FilterBar>
 
       <DataTable
+          rowOffset={(page - 1) * pageSize}
         columns={columns}
         rows={rows}
         getRowId={(c) => c.id}

@@ -164,6 +164,7 @@ export function PermissionsPage() {
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
                   <thead>
                     <tr>
+                      <th style={{ width: 64, textAlign: "center", padding: "8px 12px", color: "var(--text-muted)", fontSize: "var(--fs-caption)", fontWeight: 600 }}>SL NO</th>
                       <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--text-muted)", fontSize: "var(--fs-caption)", fontWeight: 600 }}>
                         Module
                       </th>
@@ -178,8 +179,9 @@ export function PermissionsPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {MODULE_KEYS.map((module) => (
+                    {MODULE_KEYS.map((module, index) => (
                       <tr key={module} style={{ borderTop: "1px solid var(--glass-border)" }}>
+                        <td style={{ textAlign: "center", padding: "10px 12px", color: "var(--text-muted)" }}>{index + 1}</td>
                         <td style={{ padding: "10px 12px", fontWeight: 500 }}>{MODULE_LABELS[module]}</td>
                         {PERMISSION_ACTIONS.map((action) => (
                           <td key={action} style={{ textAlign: "center", padding: "10px 12px" }}>

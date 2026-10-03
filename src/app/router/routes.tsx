@@ -6,8 +6,10 @@ import { RequireAuth } from "./RequireAuth";
 import { DashboardPage } from "../../features/dashboard/DashboardPage";
 import { UserListPage } from "../../features/users/UserListPage";
 import { ClientListPage } from "../../features/users/ClientListPage";
+import { ClientDetailPage } from "../../features/users/ClientDetailPage";
+import { AddClientPage } from "../../features/users/addClient/AddClientPage";
 import { UserDetailPage } from "../../features/users/UserDetailPage";
-import { UserFormPage } from "../../features/users/UserFormPage";
+import { AddUserPage } from "../../features/users/AddUserPage";
 import { CoachListPage } from "../../features/coaches/CoachListPage";
 import { CoachDetailPage } from "../../features/coaches/CoachDetailPage";
 import { CoachFormPage } from "../../features/coaches/CoachFormPage";
@@ -45,6 +47,7 @@ import { ProductListPage } from "../../features/commerce/ProductListPage";
 import { ProductFormPage } from "../../features/commerce/ProductFormPage";
 import { ProductViewPage } from "../../features/commerce/ProductViewPage";
 import { CouponListPage } from "../../features/commerce/CouponListPage";
+import { InCartPage } from "../../features/commerce/InCartPage";
 import { CouponFormPage } from "../../features/commerce/CouponFormPage";
 import { CouponViewPage } from "../../features/commerce/CouponViewPage";
 import { PackageListPage } from "../../features/commerce/PackageListPage";
@@ -87,9 +90,13 @@ export const router = createBrowserRouter([
 
       { path: "users", element: <UserListPage /> },
       { path: "users/clients", element: <ClientListPage /> },
-      { path: "users/new", element: <UserFormPage /> },
+      { path: "users/clients/add", element: <AddClientPage /> },
+      // The short URL from the Add Client spec; the page lives under Clients so the sidebar stays highlighted.
+      { path: "clients/add", element: <Navigate to="/users/clients/add" replace /> },
+      { path: "users/clients/:userId", element: <ClientDetailPage /> },
+      { path: "users/new", element: <AddUserPage /> },
       { path: "users/:id", element: <UserDetailPage /> },
-      { path: "users/:id/edit", element: <UserFormPage /> },
+      { path: "users/:id/edit", element: <AddUserPage /> },
 
       { path: "coaches", element: <CoachListPage /> },
       { path: "coaches/new", element: <CoachFormPage /> },
@@ -99,9 +106,10 @@ export const router = createBrowserRouter([
 
       { path: "assignments", element: <AssignmentsPage /> },
 
-      { path: "nutrition/diets", element: <DietListPage /> },
-      { path: "nutrition/diets/new", element: <DietFormPage /> },
-      { path: "nutrition/diets/:id/edit", element: <DietFormPage /> },
+      { path: "nutrition/freediets", element: <DietListPage /> },
+      { path: "nutrition/freediets/new", element: <DietFormPage /> },
+      { path: "nutrition/freediets/:id", element: <DietFormPage mode="view" /> },
+      { path: "nutrition/freediets/:id/edit", element: <DietFormPage /> },
       { path: "nutrition/foods", element: <FoodListPage /> },
       { path: "nutrition/foods/new", element: <FoodFormPage /> },
       { path: "nutrition/foods/:id/edit", element: <FoodFormPage /> },
@@ -151,6 +159,7 @@ export const router = createBrowserRouter([
       { path: "commerce/orders", element: <OrderListPage /> },
       { path: "commerce/orders/:id", element: <OrderDetailPage /> },
       { path: "commerce/coupons", element: <CouponListPage /> },
+      { path: "commerce/in-cart", element: <InCartPage /> },
       { path: "commerce/coupons/new", element: <CouponFormPage /> },
       { path: "commerce/coupons/:id", element: <CouponViewPage /> },
       { path: "commerce/coupons/:id/edit", element: <CouponFormPage /> },
