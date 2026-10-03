@@ -1,10 +1,12 @@
 import type { DietType, FoodType, FoodUnit } from "../../types/nutrition";
 
-export const DIET_TYPES: DietType[] = ["Veg", "Veg-Egg", "Veg-NonVeg"];
+export const DIET_TYPES: DietType[] = ["Veg.", "Veg/Egg", "Veg/NonVeg"];
 
-export const FOOD_UNITS: FoodUnit[] = [
-  "Bowl", "Cup", "Glass", "Grams", "ML", "Piece", "Scoop", "Serving", "Slice", "Spoon",
-];
+/**
+ * The real Food Database vocabulary, re-exported so the remaining mock-backed
+ * nutrition screens cannot drift into a second list of units.
+ */
+export { FOOD_UNITS } from "../../types/food";
 
 export const MEAL_LABELS = ["Meal 1", "Meal 2", "Meal 3", "Meal 4", "Meal 5"];
 

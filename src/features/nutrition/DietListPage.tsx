@@ -12,11 +12,16 @@ import { IconButton } from "../../components/ui/IconButton";
 import { StatusBadge } from "../../components/ui/StatusBadge";
 import { ConfirmDialog } from "../../components/ui/ConfirmDialog";
 import { useToast } from "../../components/feedback/ToastProvider";
-import { listDiets, deleteDiet } from "../../mock/nutrition/dietRepository";
+import {
+  deleteFreeDietPlan,
+  listFreeDietPlans,
+  type FreeDietPlanListRow,
+} from "../../api/freeDietPlans";
+import { ApiError } from "../../api/client";
 import { DIET_TYPES } from "../../mock/nutrition/reference";
 import { usePagedQuery } from "../../hooks/usePagedQuery";
 import { formatDate } from "../../utils/format";
-import type { DietPlan } from "../../types/nutrition";
+
 
 export function DietListPage() {
   const navigate = useNavigate();
@@ -24,34 +29,46 @@ export function DietListPage() {
   const [query, setQuery] = useState("");
   const [dietType, setDietType] = useState("");
   const [page, setPage] = useState(1);
-  const [deleteTarget, setDeleteTarget] = useState<DietPlan | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<FreeDietPlanListRow | null>(null);
   const [deleting, setDeleting] = useState(false);
   const pageSize = 10;
 
-  const params = useMemo(() => ({ query, dietType: dietType || undefined, page, pageSize }), [query, dietType, page]);
-  const { rows, total, loading, error, retry } = usePagedQuery(listDiets, params);
+  // Server-side paging, filtering and search: the backend caps pageSize, so the
+  // browser never receives the whole collection.
+  const params = useMemo(
+    () => ({ search: query || undefined, dietType: dietType || undefined, page, pageSize }),
+    [query, dietType, page],
+  );
+  const { rows, total, loading, error, retry } = usePagedQuery(listFreeDietPlans, params);
 
   async function handleDelete() {
     if (!deleteTarget) return;
     setDeleting(true);
     try {
-      await deleteDiet(deleteTarget.id);
-      show("Diet plan deleted", "info");
+      await deleteFreeDietPlan(deleteTarget.id);
+      show("Free diet plan deleted", "info");
       setDeleteTarget(null);
       retry();
+    } catch (cause) {
+      const message =
+        cause instanceof ApiError && cause.isForbidden
+          ? "Your account is not allowed to delete diet plans"
+          : "Could not delete the diet plan. Please try again.";
+      show(message, "error");
     } finally {
       setDeleting(false);
     }
   }
 
-  const columns: Column<DietPlan>[] = [
+  const columns: Column<FreeDietPlanListRow>[] = [
     { key: "dietType", header: "Diet Type", render: (d) => <StatusBadge label={d.dietType} tone="orange" /> },
     { key: "rangeFrom", header: "Range From", render: (d) => `${d.rangeFrom} kcal` },
     { key: "rangeTo", header: "Range To", render: (d) => `${d.rangeTo} kcal` },
     {
-      key: "meals",
+      key: "foodCount",
       header: "Food Items",
-      render: (d) => `${d.meals.reduce((sum, m) => sum + m.rows.length, 0)} across 5 meals`,
+      // Counted by the backend: the list response never carries the food rows.
+      render: (d) => `${d.foodCount} food row${d.foodCount === 1 ? "" : "s"}`,
     },
     { key: "updatedAt", header: "Last Updated", render: (d) => formatDate(d.updatedAt) },
   ];
@@ -59,11 +76,11 @@ export function DietListPage() {
   return (
     <>
       <PageHeader
-        title="Diet Plans"
-        breadcrumb={[{ label: "Nutrition" }, { label: "Diet Plans" }]}
-        description="Calorie-range based meal plans assigned across the client base."
+        title="Free Diet Plans"
+        breadcrumb={[{ label: "Nutrition" }, { label: "Free Diet Plans" }]}
+        description="Diet plans given to users when they complete their profile."
         actions={
-          <Button variant="primary" icon={<Plus size={15} />} onClick={() => navigate("/nutrition/diets/new")}>
+          <Button variant="primary" icon={<Plus size={15} />} onClick={() => navigate("/nutrition/freediets/new")}>
             Add Plan
           </Button>
         }
@@ -80,23 +97,24 @@ export function DietListPage() {
       </FilterBar>
 
       <DataTable
+          rowOffset={(page - 1) * pageSize}
         columns={columns}
         rows={rows}
         getRowId={(d) => d.id}
         loading={loading}
         error={error}
         onRetry={retry}
-        onRowClick={(d) => navigate(`/nutrition/diets/${d.id}/edit`)}
-        emptyTitle="No diet plans yet"
-        emptyDescription="Create your first diet plan to start assigning it to clients."
+        onRowClick={(d) => navigate(`/nutrition/freediets/${d.id}`)}
+        emptyTitle="No free diet plans yet"
+        emptyDescription="Create your first free diet plan so users get one when they complete their profile."
         emptyAction={
-          <Button variant="primary" icon={<Plus size={15} />} onClick={() => navigate("/nutrition/diets/new")}>
+          <Button variant="primary" icon={<Plus size={15} />} onClick={() => navigate("/nutrition/freediets/new")}>
             Add Plan
           </Button>
         }
         rowActions={(d) => (
           <div style={{ display: "flex", gap: 4 }}>
-            <IconButton icon={<Pencil size={15} />} label="Edit" size="sm" onClick={() => navigate(`/nutrition/diets/${d.id}/edit`)} />
+            <IconButton icon={<Pencil size={15} />} label="Edit" size="sm" onClick={() => navigate(`/nutrition/freediets/${d.id}/edit`)} />
             <IconButton icon={<Trash2 size={15} />} label="Delete" size="sm" variant="danger" onClick={() => setDeleteTarget(d)} />
           </div>
         )}
@@ -109,7 +127,7 @@ export function DietListPage() {
       <ConfirmDialog
         open={!!deleteTarget}
         title="Delete diet plan?"
-        description={`This ${deleteTarget?.dietType ?? ""} plan (${deleteTarget?.rangeFrom ?? ""}–${deleteTarget?.rangeTo ?? ""} kcal) will be permanently removed.`}
+        description={`This ${deleteTarget?.dietType ?? ""} plan (${deleteTarget?.rangeFrom ?? ""}–${deleteTarget?.rangeTo ?? ""} kcal) will be removed from the list. It is archived rather than destroyed, so plans already given to members keep their history.`}
         confirmLabel="Delete"
         onConfirm={handleDelete}
         onCancel={() => setDeleteTarget(null)}

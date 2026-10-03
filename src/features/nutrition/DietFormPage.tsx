@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams, useBlocker } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Pencil } from "lucide-react";
 import { PageHeader } from "../../components/layout/PageHeader";
 import { GlassCard } from "../../components/ui/GlassCard";
 import { Button } from "../../components/ui/Button";
@@ -11,42 +11,66 @@ import { Tabs } from "../../components/ui/Tabs";
 import { ConfirmDialog } from "../../components/ui/ConfirmDialog";
 import { SkeletonForm } from "../../components/feedback/Skeleton";
 import { useToast } from "../../components/feedback/ToastProvider";
-import { getDiet, createDiet, updateDiet, emptyMeals } from "../../mock/nutrition/dietRepository";
+import {
+  createFreeDietPlan,
+  getFreeDietPlan,
+  updateFreeDietPlan,
+  toMeals,
+} from "../../api/freeDietPlans";
+import { ApiError } from "../../api/client";
 import { DIET_TYPES } from "../../mock/nutrition/reference";
 import { MealGrid } from "./MealGrid";
 import type { DietMeal, DietType } from "../../types/nutrition";
 import formStyles from "../users/UserFormPage.module.css";
 import detailStyles from "../users/UserDetailPage.module.css";
 
-export function DietFormPage() {
+/** mode="view" renders the stored plan read-only, with an Edit action into the editor. */
+export function DietFormPage({ mode = "edit" }: { mode?: "view" | "edit" }) {
   const { id } = useParams();
   const isEdit = Boolean(id);
+  const readOnly = mode === "view";
   const navigate = useNavigate();
   const { show } = useToast();
 
-  const [dietType, setDietType] = useState<DietType>("Veg");
+  const [dietType, setDietType] = useState<DietType>("Veg.");
   const [rangeFrom, setRangeFrom] = useState("1200");
   const [rangeTo, setRangeTo] = useState("1500");
-  const [meals, setMeals] = useState<DietMeal[]>(emptyMeals());
+  // All five meal tabs exist in the editor even when the stored plan has fewer;
+  // empty ones are dropped again on save rather than written back as empty meals.
+  const [meals, setMeals] = useState<DietMeal[]>(toMeals([]));
   const [activeMeal, setActiveMeal] = useState("meal1");
 
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [errors, setErrors] = useState<{ rangeFrom?: string; rangeTo?: string }>({});
+  const [loadError, setLoadError] = useState(false);
   const [leaveConfirmOpen, setLeaveConfirmOpen] = useState(false);
 
   useEffect(() => {
     if (!id) return;
-    getDiet(id).then((d) => {
-      if (!d) return;
-      setDietType(d.dietType);
-      setRangeFrom(String(d.rangeFrom));
-      setRangeTo(String(d.rangeTo));
-      setMeals(d.meals);
-      setLoading(false);
-      setDirty(false);
-    });
+    let cancelled = false;
+
+    getFreeDietPlan(id)
+      .then((plan) => {
+        if (cancelled) return;
+        // Populated from the stored document - never from a hardcoded default.
+        setDietType(plan.dietType);
+        setRangeFrom(String(plan.rangeFrom));
+        setRangeTo(String(plan.rangeTo));
+        setMeals(plan.meals);
+        setLoading(false);
+        setDirty(false);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setLoadError(true);
+        setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
 
   const blocker = useBlocker(dirty && !saving);
@@ -114,14 +138,21 @@ export function DietFormPage() {
     try {
       const payload = { dietType, rangeFrom: Number(rangeFrom), rangeTo: Number(rangeTo), meals };
       if (isEdit && id) {
-        await updateDiet(id, payload);
-        show("Diet plan updated");
+        await updateFreeDietPlan(id, payload);
+        show("Free diet plan updated");
       } else {
-        await createDiet(payload);
-        show("Diet plan created successfully");
+        await createFreeDietPlan(payload);
+        show("Free diet plan created successfully");
       }
       setDirty(false);
-      navigate("/nutrition/diets");
+      navigate("/nutrition/freediets");
+    } catch (cause) {
+      // The backend owns validation and the duplicate-band rule, so its message
+      // is what the operator needs to see.
+      show(
+        cause instanceof ApiError ? cause.message : "Could not save the diet plan. Please try again.",
+        "error",
+      );
     } finally {
       setSaving(false);
     }
@@ -132,14 +163,39 @@ export function DietFormPage() {
 
   if (loading) return <GlassCard><SkeletonForm fields={6} /></GlassCard>;
 
+  if (loadError) {
+    return (
+      <GlassCard>
+        <p className="text-title" style={{ marginBottom: 8 }}>Could not load this diet plan</p>
+        <p className="text-caption" style={{ marginBottom: 20 }}>
+          The plan may have been deleted, or the server could not be reached.
+        </p>
+        <Button variant="primary" onClick={() => navigate("/nutrition/freediets")}>
+          Back to Free Diet Plans
+        </Button>
+      </GlassCard>
+    );
+  }
+
   return (
     <>
       <button className={formStyles.backLink} onClick={goBack}>
         <ArrowLeft size={14} /> Back
       </button>
       <PageHeader
-        title={isEdit ? "Edit Diet Plan" : "Add Diet Plan"}
-        breadcrumb={[{ label: "Nutrition", path: "/nutrition/diets" }, { label: "Diet Plans", path: "/nutrition/diets" }, { label: isEdit ? "Edit" : "Add" }]}
+        title={readOnly ? "Free Diet Plan" : isEdit ? "Edit Free Diet Plan" : "Add Free Diet Plan"}
+        breadcrumb={[
+          { label: "Nutrition", path: "/nutrition/freediets" },
+          { label: "Free Diet Plans", path: "/nutrition/freediets" },
+          { label: readOnly ? "View" : isEdit ? "Edit" : "Add" },
+        ]}
+        actions={
+          readOnly && id ? (
+            <Button variant="primary" icon={<Pencil size={15} />} onClick={() => navigate(`/nutrition/freediets/${id}/edit`)}>
+              Edit Plan
+            </Button>
+          ) : undefined
+        }
       />
 
       <div className={formStyles.sections}>
@@ -148,17 +204,18 @@ export function DietFormPage() {
           <div className={formStyles.grid}>
             <Field label="Diet Type" required>
               <Select
+                disabled={readOnly}
                 value={dietType}
                 onChange={(e) => { setDietType(e.target.value as DietType); markDirty(); }}
                 options={DIET_TYPES.map((t) => ({ label: t, value: t }))}
               />
             </Field>
             <Field label="Range From (kcal)" required error={errors.rangeFrom}>
-              <Input type="number" min="0" step="50" value={rangeFrom} error={!!errors.rangeFrom}
+              <Input disabled={readOnly} type="number" min="0" step="50" value={rangeFrom} error={!!errors.rangeFrom}
                 onChange={(e) => { setRangeFrom(e.target.value); markDirty(); }} />
             </Field>
             <Field label="Range To (kcal)" required error={errors.rangeTo}>
-              <Input type="number" min="0" step="50" value={rangeTo} error={!!errors.rangeTo}
+              <Input disabled={readOnly} type="number" min="0" step="50" value={rangeTo} error={!!errors.rangeTo}
                 onChange={(e) => { setRangeTo(e.target.value); markDirty(); }} />
             </Field>
           </div>
@@ -166,7 +223,7 @@ export function DietFormPage() {
 
         <GlassCard>
           <p className="text-title" style={{ marginBottom: 20 }}>Nutrition Totals</p>
-          <p className="text-caption" style={{ marginBottom: 16 }}>Calculated live from every meal below — no manual total step required.</p>
+          {!readOnly && <p className="text-caption" style={{ marginBottom: 16 }}>Calculated live from every meal below — no manual total step required.</p>}
           <div className={detailStyles.statGrid}>
             <Stat label="Total Calories" value={`${totals.calories.toFixed(0)} kcal`} />
             <Stat label="Total Fat" value={`${totals.fat.toFixed(1)} g`} />
@@ -180,16 +237,18 @@ export function DietFormPage() {
             <Tabs tabs={tabs} active={activeMeal} onChange={setActiveMeal} />
           </div>
           <div style={{ padding: "var(--space-5)" }}>
-            {activeMealData && <MealGrid rows={activeMealData.rows} onChange={(rows) => handleMealsChange(activeMealData.key, rows)} />}
+            {activeMealData && <MealGrid readOnly={readOnly} rows={activeMealData.rows} onChange={(rows) => handleMealsChange(activeMealData.key, rows)} />}
           </div>
         </GlassCard>
 
-        <div className={formStyles.footer}>
-          <Button variant="ghost" onClick={goBack}>Cancel</Button>
-          <Button variant="primary" loading={saving} onClick={handleSubmit}>
-            {isEdit ? "Update Plan" : "Create Plan"}
-          </Button>
-        </div>
+        {!readOnly && (
+          <div className={formStyles.footer}>
+            <Button variant="ghost" onClick={goBack}>Cancel</Button>
+            <Button variant="primary" loading={saving} onClick={handleSubmit}>
+              {isEdit ? "Update Plan" : "Create Plan"}
+            </Button>
+          </div>
+        )}
       </div>
 
       <ConfirmDialog

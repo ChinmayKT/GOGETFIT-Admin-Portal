@@ -95,6 +95,7 @@ export function FoodRequestsPage() {
       </FilterBar>
 
       <DataTable
+          rowOffset={(page - 1) * pageSize}
         columns={columns}
         rows={rows}
         getRowId={(r) => r.id}

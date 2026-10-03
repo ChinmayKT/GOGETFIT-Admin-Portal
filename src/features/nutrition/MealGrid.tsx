@@ -15,13 +15,15 @@ const UNIT_OPTIONS = FOOD_UNITS.map((u) => ({ label: u, value: u }));
 interface MealGridProps {
   rows: DietFoodRow[];
   onChange: (rows: DietFoodRow[]) => void;
+  /** View mode: inputs are locked and the row/add actions are hidden. */
+  readOnly?: boolean;
 }
 
 function emptyRow(): DietFoodRow {
   return { id: nextId("row"), foodName: "", unit: "Serving", qty: 1, calories: 0, fat: 0, carbs: 0, protein: 0 };
 }
 
-export function MealGrid({ rows, onChange }: MealGridProps) {
+export function MealGrid({ rows, onChange, readOnly = false }: MealGridProps) {
   const totals = useMemo(
     () =>
       rows.reduce(
@@ -65,12 +67,13 @@ export function MealGrid({ rows, onChange }: MealGridProps) {
   return (
     <GlassDataSurface>
       {rows.length === 0 ? (
-        <p className={styles.empty}>No food items yet. Add a row to start building this meal.</p>
+        <p className={styles.empty}>{readOnly ? "No food items in this meal." : "No food items yet. Add a row to start building this meal."}</p>
       ) : (
         <div className={styles.scroll}>
           <table className={styles.table}>
             <thead>
               <tr>
+                <th style={{ width: 64, textAlign: "center", color: "var(--text-muted)" }}>SL NO</th>
                 <th className={styles.nameCell}>Food Name</th>
                 <th className={styles.unitCell}>Unit</th>
                 <th className={styles.numCell}>Qty</th>
@@ -78,62 +81,63 @@ export function MealGrid({ rows, onChange }: MealGridProps) {
                 <th className={styles.numCell}>Fat (g)</th>
                 <th className={styles.numCell}>Carbs (g)</th>
                 <th className={styles.numCell}>Protein (g)</th>
-                <th className={styles.actionsCell} />
+                {!readOnly && <th className={styles.actionsCell} />}
               </tr>
             </thead>
             <tbody>
-              {rows.map((row) => (
+              {rows.map((row, index) => (
                 <tr key={row.id}>
+                  <td style={{ textAlign: "center", color: "var(--text-muted)" }}>{index + 1}</td>
                   <td className={styles.nameCell}>
-                    <Input value={row.foodName} placeholder="e.g. Boiled Egg" onChange={(e) => updateRow(row.id, { foodName: e.target.value })} />
+                    <Input disabled={readOnly} value={row.foodName} placeholder="e.g. Boiled Egg" onChange={(e) => updateRow(row.id, { foodName: e.target.value })} />
                   </td>
                   <td className={styles.unitCell}>
-                    <Select value={row.unit} onChange={(e) => updateRow(row.id, { unit: e.target.value as FoodUnit })} options={UNIT_OPTIONS} />
+                    <Select disabled={readOnly} value={row.unit} onChange={(e) => updateRow(row.id, { unit: e.target.value as FoodUnit })} options={UNIT_OPTIONS} />
                   </td>
                   <td className={styles.numCell}>
-                    <Input type="number" min="0" step="0.1" value={row.qty} onChange={(e) => updateRow(row.id, { qty: Number(e.target.value) || 0 })} />
+                    <Input disabled={readOnly} type="number" min="0" step="0.1" value={row.qty} onChange={(e) => updateRow(row.id, { qty: Number(e.target.value) || 0 })} />
                   </td>
                   <td className={styles.numCell}>
-                    <Input type="number" min="0" step="1" value={row.calories} onChange={(e) => updateRow(row.id, { calories: Number(e.target.value) || 0 })} />
+                    <Input disabled={readOnly} type="number" min="0" step="1" value={row.calories} onChange={(e) => updateRow(row.id, { calories: Number(e.target.value) || 0 })} />
                   </td>
                   <td className={styles.numCell}>
-                    <Input type="number" min="0" step="0.1" value={row.fat} onChange={(e) => updateRow(row.id, { fat: Number(e.target.value) || 0 })} />
+                    <Input disabled={readOnly} type="number" min="0" step="0.1" value={row.fat} onChange={(e) => updateRow(row.id, { fat: Number(e.target.value) || 0 })} />
                   </td>
                   <td className={styles.numCell}>
-                    <Input type="number" min="0" step="0.1" value={row.carbs} onChange={(e) => updateRow(row.id, { carbs: Number(e.target.value) || 0 })} />
+                    <Input disabled={readOnly} type="number" min="0" step="0.1" value={row.carbs} onChange={(e) => updateRow(row.id, { carbs: Number(e.target.value) || 0 })} />
                   </td>
                   <td className={styles.numCell}>
-                    <Input type="number" min="0" step="0.1" value={row.protein} onChange={(e) => updateRow(row.id, { protein: Number(e.target.value) || 0 })} />
+                    <Input disabled={readOnly} type="number" min="0" step="0.1" value={row.protein} onChange={(e) => updateRow(row.id, { protein: Number(e.target.value) || 0 })} />
                   </td>
-                  <td className={styles.actionsCell}>
+                  {!readOnly && <td className={styles.actionsCell}>
                     <div style={{ display: "flex", gap: 4 }}>
                       <IconButton icon={<Copy size={14} />} label="Duplicate row" size="sm" onClick={() => duplicateRow(row.id)} disabled={atCap} />
                       <IconButton icon={<Trash2 size={14} />} label="Delete row" size="sm" variant="danger" onClick={() => deleteRow(row.id)} />
                     </div>
-                  </td>
+                  </td>}
                 </tr>
               ))}
             </tbody>
             <tfoot>
               <tr className={styles.subtotalRow}>
-                <td colSpan={3}>Meal Subtotal</td>
+                <td colSpan={4}>Meal Subtotal</td>
                 <td>{totals.calories.toFixed(0)}</td>
                 <td>{totals.fat.toFixed(1)}</td>
                 <td>{totals.carbs.toFixed(1)}</td>
                 <td>{totals.protein.toFixed(1)}</td>
-                <td />
+                {!readOnly && <td />}
               </tr>
             </tfoot>
           </table>
         </div>
       )}
 
-      <div className={styles.footer}>
+      {!readOnly && <div className={styles.footer}>
         <Button variant="secondary" size="sm" icon={<Plus size={14} />} onClick={addRow} disabled={atCap}>
           Add Row
         </Button>
         {atCap && <span className={styles.capWarning}>Maximum {MEAL_MAX_ROWS} rows per meal reached — remove a row to add another.</span>}
-      </div>
+      </div>}
     </GlassDataSurface>
   );
 }

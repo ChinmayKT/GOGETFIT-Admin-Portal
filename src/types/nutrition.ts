@@ -1,6 +1,17 @@
-export type DietType = "Veg" | "Veg-Egg" | "Veg-NonVeg";
-export type FoodUnit = "Bowl" | "Cup" | "Glass" | "Grams" | "ML" | "Piece" | "Scoop" | "Serving" | "Slice" | "Spoon";
-export type FoodType = "Vegetarian" | "Non-Vegetarian";
+/**
+ * Exactly the values the legacy Admin Portal's Diet Type dropdown offered and
+ * m_plan.diet_type stores, so the portal, the API and MongoDB share one
+ * vocabulary with no translation table in between.
+ */
+export type DietType = "Veg." | "Veg/Egg" | "Veg/NonVeg";
+
+/**
+ * The food vocabulary is owned by types/food.ts, which mirrors the backend Food
+ * model. Re-exported here so the diet screens keep one import path.
+ */
+import type { FoodType, FoodUnit } from "./food";
+
+export type { FoodType, FoodUnit };
 export type FoodRequestStatus = "Pending" | "Added" | "Rejected";
 
 export interface DietFoodRow {
@@ -35,22 +46,6 @@ export interface DietPlan {
   meals: DietMeal[];
   createdAt: string;
   updatedAt: string;
-}
-
-export interface Food {
-  id: string;
-  foodName: string;
-  foodType: FoodType;
-  brandName: string;
-  unit: FoodUnit;
-  qty: number;
-  comments: string;
-  calories: number;
-  fat: number;
-  carbs: number;
-  protein: number;
-  image: string | null;
-  createdAt: string;
 }
 
 export interface FoodRequest {
