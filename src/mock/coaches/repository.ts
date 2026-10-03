@@ -1,52 +1,16 @@
 import type { Coach } from "../../types/coach";
+
+/*
+ * Mock coaches for the screens not yet on the backend (Finance, Assignments,
+ * Certificates). Coach create/edit/list lives in src/api/coaches.ts only.
+ */
 import { MOCK_COACHES } from "./data";
-import { delay, matchesQuery, nextId, paginate, sortRows } from "../shared/utils";
+import { delay, nextId } from "../shared/utils";
 
 let store: Coach[] = [...MOCK_COACHES];
 
-export interface CoachListParams {
-  query?: string;
-  level?: number;
-  status?: string;
-  page?: number;
-  pageSize?: number;
-  sortKey?: string;
-  sortDir?: "asc" | "desc";
-}
-
-export async function listCoaches(params: CoachListParams = {}) {
-  const { query = "", level, status, page = 1, pageSize = 10, sortKey = "activeClients", sortDir = "desc" } = params;
-
-  let rows = store.filter((c) =>
-    matchesQuery([c.firstName, c.lastName, c.email, c.city, c.specialization], query),
-  );
-  if (level) rows = rows.filter((c) => c.level === level);
-  if (status) rows = rows.filter((c) => c.status === status);
-  rows = sortRows(rows, sortKey, sortDir);
-
-  return delay(paginate(rows, page, pageSize));
-}
-
 export async function getCoach(id: string) {
   return delay(store.find((c) => c.id === id) ?? null);
-}
-
-export async function createCoach(input: Omit<Coach, "id" | "certificates" | "activeClients" | "pendingClients" | "joinedAt">) {
-  const coach: Coach = {
-    ...input,
-    id: nextId("coach"),
-    certificates: [],
-    activeClients: 0,
-    pendingClients: 0,
-    joinedAt: new Date().toISOString(),
-  };
-  store = [coach, ...store];
-  return delay(coach, 600);
-}
-
-export async function updateCoach(id: string, patch: Partial<Coach>) {
-  store = store.map((c) => (c.id === id ? { ...c, ...patch } : c));
-  return delay(store.find((c) => c.id === id)!, 600);
 }
 
 export async function addCertificate(coachId: string, fileName: string) {

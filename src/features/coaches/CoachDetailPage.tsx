@@ -1,59 +1,71 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Pencil, Link2, FileBadge } from "lucide-react";
+import { ArrowLeft, Pencil, Link2 } from "lucide-react";
 import { GlassCard } from "../../components/ui/GlassCard";
-import { ProfileHeaderEditor } from "../../components/media/ProfileHeaderEditor";
-import { StatusBadge, type StatusTone } from "../../components/ui/StatusBadge";
+import { StatusBadge } from "../../components/ui/StatusBadge";
 import { Tabs } from "../../components/ui/Tabs";
+import { ImageLightbox } from "../../components/ui/ImageLightbox";
+import { ProfileHeaderEditor } from "../../components/media/ProfileHeaderEditor";
 import { Button } from "../../components/ui/Button";
-import { DataTable, type Column } from "../../components/data-display/DataTable";
 import { SkeletonProfile } from "../../components/feedback/Skeleton";
 import { ErrorState } from "../../components/feedback/ErrorState";
 import { EmptyState } from "../../components/feedback/EmptyState";
-import { getCoach } from "../../mock/coaches/repository";
-import { MOCK_CLIENTS } from "../../mock/users/clientsData";
+import { ApiError } from "../../api/client";
+import { getCoach } from "../../api/coaches";
+import { CoachClients } from "./CoachClients";
+import { resolveMediaUrl } from "../../api/media";
 import { formatDate } from "../../utils/format";
-import type { Coach } from "../../types/coach";
-import type { Client } from "../../types/user";
+import type { CoachRecord } from "../../types/coach";
+import { CoachUserCard } from "./CoachUserCard";
+import { CoachLevelPlans } from "./CoachLevelPlans";
 import styles from "../users/UserDetailPage.module.css";
 
-const STATUS_TONE: Record<string, StatusTone> = { Active: "success", "Pending Approval": "warning", Inactive: "neutral" };
-
+/** The same tabbed layout as User and Client details. */
 const TABS = [
-  { key: "overview", label: "Overview" },
-  { key: "clients", label: "Clients" },
+  { key: "user", label: "User Profile" },
+  { key: "coach", label: "Coach Profile" },
   { key: "plans", label: "Plans" },
-  { key: "performance", label: "Performance" },
-  { key: "certificates", label: "Certificates" },
-  { key: "activity", label: "Activity" },
+  { key: "clients", label: "Clients" },
 ];
+type TabKey = "user" | "coach" | "plans" | "clients";
 
 export function CoachDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [coach, setCoach] = useState<Coach | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-  const [tab, setTab] = useState("overview");
+  const [coach, setCoach] = useState<CoachRecord | null>(null);
+  const [state, setState] = useState<"loading" | "ready" | "notFound" | "error">("loading");
+  const [attempt, setAttempt] = useState(0);
+  const [tab, setTab] = useState<TabKey>("user");
 
   useEffect(() => {
     if (!id) return;
-    setLoading(true);
-    getCoach(id).then((c) => setCoach(c)).catch(() => setError(true)).finally(() => setLoading(false));
-  }, [id]);
+    let cancelled = false;
+    setState("loading");
+    getCoach(id)
+      .then((c) => {
+        if (cancelled) return;
+        setCoach(c);
+        setState("ready");
+      })
+      .catch((cause) => {
+        if (cancelled) return;
+        setState(cause instanceof ApiError && cause.status === 404 ? "notFound" : "error");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [id, attempt]);
 
-  const clients = useMemo(() => MOCK_CLIENTS.filter((c) => c.coachId === id), [id]);
+  if (state === "loading") return <GlassCard><SkeletonProfile /></GlassCard>;
+  if (state === "error") return <ErrorState onRetry={() => setAttempt((n) => n + 1)} />;
+  if (state === "notFound" || !coach) return <EmptyState title="Coach not found" />;
 
-  const clientColumns: Column<Client>[] = [
-    { key: "clientName", header: "Client" },
-    { key: "planName", header: "Plan" },
-    { key: "status", header: "Status", render: (c) => <StatusBadge label={c.status} tone={c.status === "Active" ? "success" : "neutral"} /> },
-    { key: "startDate", header: "Start", render: (c) => formatDate(c.startDate) },
-  ];
-
-  if (loading) return <GlassCard><SkeletonProfile /></GlassCard>;
-  if (error) return <ErrorState onRetry={() => window.location.reload()} />;
-  if (!coach) return <EmptyState title="Coach not found" />;
+  const { profile, user } = coach;
+  const links = [
+    ["Facebook", profile.facebook],
+    ["Instagram", profile.instagram],
+    ["LinkedIn", profile.linkedin],
+  ].filter((entry): entry is [string, string] => Boolean(entry[1]));
 
   return (
     <>
@@ -61,101 +73,96 @@ export function CoachDetailPage() {
         <button className={styles.backLink} onClick={() => navigate("/coaches")}>
           <ArrowLeft size={14} /> Back to Coaches
         </button>
-        <div style={{ display: "flex", gap: 8 }}>
-          <Button variant="secondary" icon={<FileBadge size={15} />} onClick={() => navigate(`/coaches/${coach.id}/certificates`)}>
-            Certificates
-          </Button>
-          <Button variant="primary" icon={<Pencil size={15} />} onClick={() => navigate(`/coaches/${coach.id}/edit`)}>
-            Edit Coach
-          </Button>
-        </div>
+        <Button variant="primary" icon={<Pencil size={15} />} onClick={() => navigate(`/coaches/${coach.id}/edit`)}>
+          Edit Coach
+        </Button>
       </div>
 
-      <GlassCard padding="none" style={{ padding: "20px 20px 24px", marginBottom: 24 }}>
-        <ProfileHeaderEditor
-          readOnly
-          name={`${coach.firstName} ${coach.lastName}`}
-          coverUrl={coach.coverPhoto}
-          avatarUrl={coach.profilePicture}
-        />
-        <div>
-          <h1 className={styles.name}>{coach.firstName} {coach.lastName}</h1>
-          <div className={styles.metaRow} style={{ marginTop: 6 }}>
-            <span className="text-caption">Level {coach.level}</span>
-            <StatusBadge label={coach.status} tone={STATUS_TONE[coach.status]} />
-            <span className="text-caption">{coach.specialization}</span>
-            <span className="text-caption">{coach.city}, {coach.state}</span>
-            <span className="text-caption">Joined {formatDate(coach.joinedAt)}</span>
+      <GlassCard style={{ marginBottom: 24 }}>
+        <div className={styles.headerInfo}>
+          <h1 className={styles.name}>{user?.name ?? "Unnamed coach"}</h1>
+          <div className={styles.metaRow}>
+            <span className="text-caption">{profile.level}</span>
+            <StatusBadge
+              label={coach.status === "active" ? "Active" : "Inactive"}
+              tone={coach.status === "active" ? "success" : "neutral"}
+            />
+            {profile.specialization && <span className="text-caption">{profile.specialization}</span>}
+            {coach.createdAt && <span className="text-caption">Coach since {formatDate(coach.createdAt)}</span>}
           </div>
         </div>
       </GlassCard>
 
       <div className={styles.tabsRow}>
-        <Tabs tabs={TABS} active={tab} onChange={setTab} />
+        <Tabs tabs={TABS} active={tab} onChange={(key) => setTab(key as TabKey)} />
       </div>
 
-      {tab === "overview" && (
-        <div className={styles.overviewGrid}>
-          <GlassCard className={styles.statsCard}>
-            <div className={styles.statGrid}>
-              <Stat label="Active Clients" value={String(coach.activeClients)} />
-              <Stat label="Pending Clients" value={String(coach.pendingClients)} />
-              <Stat label="Available Slots" value={String(coach.availableSlots)} />
-              <Stat label="Transformations" value={String(coach.transformationsCount)} />
-              <Stat label="Languages" value={coach.languages.join(", ")} />
-              <Stat label="Email" value={coach.email} />
-              <Stat label="Phone" value={coach.phone} />
-              <Stat label="Certificates" value={String(coach.certificates.length)} />
-            </div>
-          </GlassCard>
+      {tab === "user" &&
+        (user ? (
+          <CoachUserCard user={user} title="User Profile" />
+        ) : (
           <GlassCard>
-            <p className="text-title" style={{ marginBottom: 10 }}>About</p>
-            <p className="text-secondary" style={{ lineHeight: 1.6 }}>{coach.description}</p>
-            <div style={{ display: "flex", gap: 14, marginTop: 20, flexWrap: "wrap" }}>
-              {coach.facebook && <a href={coach.facebook} target="_blank" rel="noreferrer" className="text-caption" style={{ display: "flex", alignItems: "center", gap: 4 }}><Link2 size={14} /> Facebook</a>}
-              {coach.instagram && <a href={coach.instagram} target="_blank" rel="noreferrer" className="text-caption" style={{ display: "flex", alignItems: "center", gap: 4 }}><Link2 size={14} /> Instagram</a>}
-              {coach.linkedin && <a href={coach.linkedin} target="_blank" rel="noreferrer" className="text-caption" style={{ display: "flex", alignItems: "center", gap: 4 }}><Link2 size={14} /> LinkedIn</a>}
-              {!coach.facebook && !coach.instagram && !coach.linkedin && <span className="text-caption">No social links added.</span>}
-            </div>
+            <p className="text-caption">The user linked to this coach could not be loaded.</p>
           </GlassCard>
-        </div>
-      )}
+        ))}
 
-      {tab === "clients" && (
-        <DataTable
-          columns={clientColumns}
-          rows={clients}
-          getRowId={(c) => c.id}
-          emptyTitle="No clients assigned"
-          emptyDescription="This coach doesn't have any active clients yet."
-        />
-      )}
-
-      {tab === "certificates" && (
+      {tab === "coach" && (
         <GlassCard>
-          {coach.certificates.length === 0 ? (
-            <EmptyState title="No certificates uploaded" description="Add certification documents for this coach." action={
-              <Button variant="primary" onClick={() => navigate(`/coaches/${coach.id}/certificates`)}>Upload Certificate</Button>
-            } />
-          ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {coach.certificates.map((cert) => (
-                <div key={cert.id} style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid var(--glass-border)" }}>
-                  <span>{cert.fileName}</span>
-                  <span className="text-caption">{formatDate(cert.uploadedAt)}</span>
-                </div>
-              ))}
-            </div>
-          )}
+          <CoachPhotos
+            name={user?.name ?? "Coach"}
+            coverUrl={resolveMediaUrl(profile.coverPicture?.url)}
+            avatarUrl={resolveMediaUrl(profile.profilePicture?.url)}
+          />
+          <p className="text-title" style={{ margin: "20px 0" }}>Coach Profile</p>
+          <div className={styles.statGrid}>
+            <Stat label="Level" value={profile.level} />
+            <Stat label="Specialization" value={profile.specialization ?? "—"} />
+            <Stat label="Languages" value={profile.languages.length ? profile.languages.join(", ") : "—"} />
+            <Stat label="Transformations" value={String(profile.transformations ?? 0)} />
+            <Stat label="Available Slots" value={String(profile.availableSlots ?? 0)} />
+            <Stat label="Coach Status" value={coach.status === "active" ? "Active" : "Inactive"} />
+          </div>
+          <p className="text-title" style={{ margin: "24px 0 10px" }}>Description</p>
+          <p className="text-secondary" style={{ lineHeight: 1.6, whiteSpace: "pre-wrap" }}>
+            {profile.description ?? "No description added."}
+          </p>
+          <div style={{ display: "flex", gap: 14, marginTop: 20, flexWrap: "wrap" }}>
+            {links.map(([label, href]) => (
+              <a key={label} href={href} target="_blank" rel="noreferrer" className="text-caption"
+                style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <Link2 size={14} /> {label}
+              </a>
+            ))}
+            {links.length === 0 && <span className="text-caption">No social links added.</span>}
+          </div>
         </GlassCard>
       )}
 
-      {["plans", "performance", "activity"].includes(tab) && (
-        <GlassCard>
-          <EmptyState title={`No ${tab} data yet`} description="This section will populate as the coach's history grows." />
-        </GlassCard>
-      )}
+      {tab === "plans" && <CoachLevelPlans level={profile.level} />}
+      {tab === "clients" && <CoachClients coachId={coach.id} />}
     </>
+  );
+}
+
+/**
+ * The coach's OWN cover and profile pictures (never the user's account picture),
+ * in the same cover + avatar layout as the coach form. Clicking a picture shows
+ * it full screen.
+ */
+function CoachPhotos({ name, coverUrl, avatarUrl }: { name: string; coverUrl: string | null; avatarUrl: string | null }) {
+  const [viewing, setViewing] = useState<{ src: string; alt: string } | null>(null);
+  const close = useCallback(() => setViewing(null), []);
+  return (
+    <div
+      onClick={(event) => {
+        const target = event.target;
+        if (target instanceof HTMLImageElement) setViewing({ src: target.src, alt: target.alt });
+      }}
+      style={{ cursor: coverUrl || avatarUrl ? "zoom-in" : undefined }}
+    >
+      <ProfileHeaderEditor readOnly name={name} coverUrl={coverUrl} avatarUrl={avatarUrl} />
+      <ImageLightbox open={viewing !== null} src={viewing?.src ?? ""} alt={viewing?.alt ?? ""} onClose={close} />
+    </div>
   );
 }
 
