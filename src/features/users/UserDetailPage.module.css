@@ -71,3 +71,17 @@
   font-size: var(--fs-title);
   font-weight: var(--fw-semibold);
 }
+
+/* The profile photo opens full screen. */
+.photoButton {
+  padding: 0;
+  border-radius: var(--radius-full);
+  cursor: zoom-in;
+  transition: transform var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
+}
+.photoButton:hover,
+.photoButton:focus-visible {
+  outline: none;
+  transform: scale(1.03);
+  box-shadow: 0 0 0 3px var(--ggf-orange-dim);
+}

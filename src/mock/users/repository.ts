@@ -8,6 +8,8 @@ export interface UserListParams {
   query?: string;
   status?: string;
   goal?: string;
+  /** "yes" = users who bought a plan (they also appear in the client list), "no" = registered only. */
+  subscribed?: "yes" | "no";
   coachId?: string;
   page?: number;
   pageSize?: number;
@@ -16,13 +18,14 @@ export interface UserListParams {
 }
 
 export async function listUsers(params: UserListParams = {}) {
-  const { query = "", status, goal, coachId, page = 1, pageSize = 10, sortKey = "joinedAt", sortDir = "desc" } = params;
+  const { query = "", status, goal, subscribed, coachId, page = 1, pageSize = 10, sortKey = "joinedAt", sortDir = "desc" } = params;
 
   let rows = store.filter((u) =>
     matchesQuery([u.firstName, u.lastName, u.email, u.phone, u.ggfId, u.city], query),
   );
   if (status) rows = rows.filter((u) => u.status === status);
   if (goal) rows = rows.filter((u) => u.goal === goal);
+  if (subscribed) rows = rows.filter((u) => (subscribed === "yes" ? u.planName !== null : u.planName === null));
   if (coachId) rows = rows.filter((u) => u.coachId === coachId);
   rows = sortRows(rows, sortKey, sortDir);
 

@@ -1,0 +1,177 @@
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: var(--space-4);
+  font-size: var(--fs-label);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.backLink:hover {
+  color: var(--text-primary);
+}
+
+/* Full width, four columns: the whole form fits on one desktop screen. */
+.card {
+  width: 100%;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-4) var(--space-5);
+}
+@media (max-width: 1200px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 700px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.segmented {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+.segment {
+  height: 40px;
+  padding: 0 var(--space-3);
+  text-align: center;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  background: var(--glass-fill);
+  color: var(--text-secondary);
+  font-size: var(--fs-label);
+  font-weight: var(--fw-medium);
+  cursor: pointer;
+}
+.segment:hover {
+  border-color: var(--glass-border-bright);
+  color: var(--text-primary);
+}
+.segmentActive,
+.segmentActive:hover {
+  border-color: var(--ggf-orange);
+  background: var(--ggf-orange-dim);
+  color: var(--text-primary);
+}
+
+.withChip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.chip {
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  border: 1px dashed var(--glass-border-bright);
+  font-size: var(--fs-label);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.unitWrap {
+  position: relative;
+}
+/* Beside the converted-cm box, the input takes the remaining width. */
+.withChip .unitWrap {
+  flex: 1;
+  min-width: 0;
+}
+.unitWrap input {
+  padding-right: 40px;
+}
+/* The number spinner would sit under the unit label. */
+.unitWrap input::-webkit-inner-spin-button,
+.unitWrap input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.unitWrap input[type="number"] {
+  -moz-appearance: textfield;
+}
+.unit {
+  position: absolute;
+  right: var(--space-3);
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  color: var(--text-muted);
+  font-size: var(--fs-label);
+  pointer-events: none;
+}
+
+.calculated {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-5);
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--glass-border);
+}
+@media (max-width: 760px) {
+  .calculated {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.readout {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--glass-border-bright);
+}
+.readoutLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--fs-caption);
+  color: var(--text-muted);
+}
+.badge {
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--glass-fill-bright);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.readoutValue {
+  font-size: var(--fs-title);
+  font-weight: var(--fw-semibold);
+}
+.readoutEmpty {
+  font-size: var(--fs-caption);
+  color: var(--text-disabled);
+}
+.calcNote {
+  margin-right: auto;
+}
+
+.serverError {
+  margin-top: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-error-border);
+  border-radius: var(--radius-md);
+  background: var(--color-error-bg);
+  color: var(--color-error);
+  font-size: var(--fs-label);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--glass-border);
+}

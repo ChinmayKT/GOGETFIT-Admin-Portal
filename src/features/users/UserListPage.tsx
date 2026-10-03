@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { formatDate } from "../../utils/format";
 import { useNavigate } from "react-router-dom";
 import { Plus, Download, Eye, Pencil } from "lucide-react";
 import { PageHeader } from "../../components/layout/PageHeader";
@@ -9,59 +10,110 @@ import { DataTable, type Column } from "../../components/data-display/DataTable"
 import { Pagination } from "../../components/data-display/Pagination";
 import { Button } from "../../components/ui/Button";
 import { IconButton } from "../../components/ui/IconButton";
-import { StatusBadge, type StatusTone } from "../../components/ui/StatusBadge";
 import { Avatar } from "../../components/ui/Avatar";
-import { listUsers } from "../../mock/users/repository";
+import { resolveMediaUrl } from "../../api/media";
+import { StatusBadge, type StatusTone } from "../../components/ui/StatusBadge";
+import { RoleBadges } from "../../components/ui/RoleBadges";
+import { listAdminUsers } from "../../api/adminUsers";
 import { usePagedQuery } from "../../hooks/usePagedQuery";
 import { useToast } from "../../components/feedback/ToastProvider";
-import type { AppUser } from "../../types/user";
-import { GOALS } from "../../mock/shared/reference";
+import type { AdminUser, AccountStatus, Role } from "../../types/admin";
 
-const STATUS_TONE: Record<string, StatusTone> = { Active: "success", Inactive: "neutral", Pending: "warning" };
+const PAGE_SIZE = 25;
+
+const STATUS_TONES: Record<AccountStatus, StatusTone> = {
+  active: "success",
+  inactive: "neutral",
+  blocked: "error",
+};
+
 
 export function UserListPage() {
   const navigate = useNavigate();
   const { show } = useToast();
   const [query, setQuery] = useState("");
+  const [role, setRole] = useState("");
   const [status, setStatus] = useState("");
-  const [goal, setGoal] = useState("");
   const [page, setPage] = useState(1);
-  const pageSize = 10;
 
   const params = useMemo(
-    () => ({ query, status: status || undefined, goal: goal || undefined, page, pageSize }),
-    [query, status, goal, page],
+    () => ({
+      search: query || undefined,
+      // The <Select> yields a plain string; narrow it to Role for the client.
+      role: (role || undefined) as Role | undefined,
+      status: status || undefined,
+      page,
+      pageSize: PAGE_SIZE,
+    }),
+    [query, role, status, page],
   );
-  const { rows, total, loading, error, retry } = usePagedQuery(listUsers, params);
 
-  const columns: Column<AppUser>[] = [
+  // Server-side pagination, search and filtering - the browser never receives
+  // more than one page.
+  const { rows, total, loading, error, retry } = usePagedQuery(listAdminUsers, params);
+
+  const columns: Column<AdminUser>[] = [
     {
       key: "name",
       header: "User",
       render: (u) => (
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <Avatar name={`${u.firstName} ${u.lastName}`} size="sm" />
+          <Avatar
+            name={u.profile.name ?? u.profile.email ?? "?"}
+            // The member's own photo when they have uploaded one; the initials
+            // fall back automatically when they have not.
+            src={resolveMediaUrl(u.profile.profilePicture) ?? undefined}
+            size="sm"
+          />
           <div>
-            <div style={{ fontWeight: 600 }}>
-              {u.firstName} {u.lastName}
-            </div>
-            <div className="text-caption">{u.ggfId}</div>
+            <div style={{ fontWeight: 600 }}>{u.profile.name ?? "—"}</div>
+            <div className="text-caption">{u.phone.normalized ?? "—"}</div>
           </div>
         </div>
       ),
     },
-    { key: "gender", header: "Gender" },
-    { key: "age", header: "Age", render: (u) => String(new Date().getFullYear() - new Date(u.dob).getFullYear()) },
-    { key: "phone", header: "Phone" },
-    { key: "email", header: "Email" },
-    { key: "city", header: "City / State", render: (u) => `${u.city}, ${u.state}` },
-    { key: "goal", header: "Goal" },
-    { key: "coachName", header: "Coach", render: (u) => u.coachName ?? "— Unassigned" },
+    {
+      key: "email",
+      header: "Email",
+      render: (u) => (
+        <div>
+          <div>{u.profile.email ?? "—"}</div>
+          {/* Only the user can verify an email, in the app. */}
+          {u.profile.email && (
+            <div className="text-caption" style={{ color: u.profile.isEmailVerified ? "var(--color-success)" : "var(--color-warning)" }}>
+              {u.profile.isEmailVerified ? "Verified" : "Not verified"}
+            </div>
+          )}
+        </div>
+      ),
+    },
+    // Roles are additive, so every role is shown, not a single persona.
+    { key: "roles", header: "Roles", render: (u) => <RoleBadges roles={u.roles} /> },
+    {
+      key: "profileCompleted",
+      header: "Profile",
+      render: (u) => (
+        <StatusBadge
+          label={u.profileCompleted ? "Complete" : "Incomplete"}
+          tone={u.profileCompleted ? "success" : "warning"}
+          dot={false}
+        />
+      ),
+    },
     {
       key: "status",
       header: "Status",
-      render: (u) => <StatusBadge label={u.status} tone={STATUS_TONE[u.status]} />,
+      render: (u) =>
+        u.status ? (
+          <StatusBadge
+            label={u.status[0].toUpperCase() + u.status.slice(1)}
+            tone={STATUS_TONES[u.status]}
+          />
+        ) : (
+          <span className="text-caption">—</span>
+        ),
     },
+    { key: "createdAt", header: "Created", render: (u) => formatDate(u.createdAt) },
   ];
 
   return (
@@ -69,10 +121,14 @@ export function UserListPage() {
       <PageHeader
         title="Users"
         breadcrumb={[{ label: "People" }, { label: "Users" }]}
-        description="All registered app users and their fitness profiles."
+        description="Every account in the GoGetFit app. Roles are additive — an account can be a user, client, coach and admin at once."
         actions={
           <>
-            <Button variant="secondary" icon={<Download size={15} />} onClick={() => show("Export started — you'll be notified when it's ready", "info")}>
+            <Button
+              variant="secondary"
+              icon={<Download size={15} />}
+              onClick={() => show("Export started — you'll be notified when it's ready", "info")}
+            >
               Export
             </Button>
             <Button variant="primary" icon={<Plus size={15} />} onClick={() => navigate("/users/new")}>
@@ -83,27 +139,47 @@ export function UserListPage() {
       />
 
       <FilterBar>
-        <SearchInput value={query} onChange={(v) => { setQuery(v); setPage(1); }} placeholder="Search by name, email, phone, GGF ID..." />
+        <SearchInput
+          value={query}
+          onChange={(v) => {
+            setQuery(v);
+            setPage(1);
+          }}
+          placeholder="Search by name, email, phone, city..."
+        />
         <Select
-          value={status}
-          onChange={(e) => { setStatus(e.target.value); setPage(1); }}
-          placeholder="Status"
+          value={role}
+          onChange={(e) => {
+            setRole(e.target.value);
+            setPage(1);
+          }}
+          placeholder="Role"
           options={[
-            { label: "All statuses", value: "" },
-            { label: "Active", value: "Active" },
-            { label: "Inactive", value: "Inactive" },
-            { label: "Pending", value: "Pending" },
+            { label: "All roles", value: "" },
+            { label: "User", value: "user" },
+            { label: "Client", value: "client" },
+            { label: "Coach", value: "coach" },
+            { label: "Admin", value: "admin" },
           ]}
         />
         <Select
-          value={goal}
-          onChange={(e) => { setGoal(e.target.value); setPage(1); }}
-          placeholder="Goal"
-          options={[{ label: "All goals", value: "" }, ...GOALS.map((g) => ({ label: g, value: g }))]}
+          value={status}
+          onChange={(e) => {
+            setStatus(e.target.value);
+            setPage(1);
+          }}
+          placeholder="Status"
+          options={[
+            { label: "All statuses", value: "" },
+            { label: "Active", value: "active" },
+            { label: "Inactive", value: "inactive" },
+            { label: "Blocked", value: "blocked" },
+          ]}
         />
       </FilterBar>
 
       <DataTable
+          rowOffset={(page - 1) * PAGE_SIZE}
         columns={columns}
         rows={rows}
         getRowId={(u) => u.id}
@@ -116,13 +192,18 @@ export function UserListPage() {
         rowActions={(u) => (
           <div style={{ display: "flex", gap: 4 }}>
             <IconButton icon={<Eye size={15} />} label="View" size="sm" onClick={() => navigate(`/users/${u.id}`)} />
-            <IconButton icon={<Pencil size={15} />} label="Edit" size="sm" onClick={() => navigate(`/users/${u.id}/edit`)} />
+            <IconButton
+              icon={<Pencil size={15} />}
+              label="Edit"
+              size="sm"
+              onClick={() => navigate(`/users/${u.id}/edit`)}
+            />
           </div>
         )}
       />
 
       {!loading && !error && rows.length > 0 && (
-        <Pagination page={page} pageSize={pageSize} total={total} onPageChange={setPage} />
+        <Pagination page={page} pageSize={PAGE_SIZE} total={total} onPageChange={setPage} />
       )}
     </>
   );
