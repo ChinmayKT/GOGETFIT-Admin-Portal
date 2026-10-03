@@ -28,7 +28,7 @@ const ICONS: Record<string, typeof LayoutDashboard> = {
   "/users/clients": UserCheck,
   "/coaches": Award,
   "/assignments": Link2,
-  "/nutrition/diets": Utensils,
+  "/nutrition/freediets": Utensils,
   "/nutrition/foods": Apple,
   "/nutrition/requests": Inbox,
   "/nutrition/log": ClipboardList,
@@ -107,8 +107,10 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                     key={item.path}
                     to={item.path}
                     end={EXACT_MATCH_PATHS.has(item.path)}
-                    className={({ isActive }) => cn(styles.item, isActive && styles.active)}
-                    title={collapsed ? item.label : undefined}
+                    className={({ isActive }) =>
+                      cn(styles.item, isActive && styles.active, !item.built && styles.pending)
+                    }
+                    title={collapsed ? item.label : item.built ? undefined : `${item.label} — not built yet`}
                   >
                     <Icon size={17} strokeWidth={2} />
                     {!collapsed && <span>{item.label}</span>}

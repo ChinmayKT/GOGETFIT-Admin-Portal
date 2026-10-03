@@ -1,0 +1,83 @@
+.stage {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  /* Extra room above and below so the dimmed, cut-off parts stay visible. */
+  padding: 56px var(--space-4);
+  border-radius: var(--radius-lg);
+  background:
+    repeating-conic-gradient(rgba(255, 255, 255, 0.04) 0% 25%, transparent 0% 50%) 0 0 / 20px 20px,
+    rgba(0, 0, 0, 0.35);
+}
+
+.frame {
+  position: relative;
+  max-width: 100%;
+  /* The image spills past the frame so the admin sees what will be cut off;
+     ::after dims everything outside the frame. The stage clips the spill. */
+  overflow: visible;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  background: var(--glass-fill);
+}
+.frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  border: 2px solid var(--ggf-orange);
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.62);
+}
+.frame:active {
+  cursor: grabbing;
+}
+.frame:focus-visible {
+  outline: none;
+}
+.frame:focus-visible::after {
+  border-width: 3px;
+}
+
+.image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-width: none;
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
+.status {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: var(--fs-caption);
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  color: var(--text-muted);
+}
+
+.slider {
+  flex: 1;
+  accent-color: var(--ggf-orange);
+}
+
+.zoomValue {
+  min-width: 44px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--fs-label);
+  font-weight: var(--fw-medium);
+  color: var(--text-primary);
+}

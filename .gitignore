@@ -28,3 +28,8 @@ dist-ssr
 
 # local Claude Code session state
 .claude/
+
+# Local environment (never commit; may hold API targets/secrets)
+.env
+.env.*
+!.env.example

@@ -58,3 +58,12 @@
   width: 1%;
   white-space: nowrap;
 }
+
+/* SL NO - the first column of every table. */
+.serialCell {
+  width: 64px;
+  white-space: nowrap;
+  text-align: center;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}

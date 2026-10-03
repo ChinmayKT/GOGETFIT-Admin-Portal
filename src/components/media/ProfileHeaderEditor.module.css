@@ -1,10 +1,12 @@
 .root {
   position: relative;
-  margin-bottom: 56px; /* room for the avatar overlapping below the cover */
+  margin-bottom: 100px; /* room for the avatar overlapping below the cover */
 }
 
 .cover {
-  height: 180px;
+  /* Fixed ratio (not a fixed height) so the header and the upload preview crop
+     the same way at any width. Keep in sync with COVER_ASPECT_RATIO. */
+  aspect-ratio: 3 / 1;
   width: 100%;
   border-radius: var(--radius-lg);
   background-color: var(--glass-fill);
@@ -25,6 +27,13 @@
 }
 .cover.readOnly:hover {
   border-color: var(--glass-border);
+}
+.coverImg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 .coverEmpty {
   background-image: linear-gradient(135deg, rgba(255, 122, 0, 0.16), rgba(255, 122, 0, 0.03));
@@ -69,12 +78,12 @@
 .avatarWrap {
   position: absolute;
   left: var(--space-6);
-  bottom: -48px;
+  bottom: -90px;
 }
 .avatar {
   position: relative;
-  width: 96px;
-  height: 96px;
+  width: 180px;
+  height: 180px;
   border-radius: 50%;
   background: linear-gradient(145deg, rgba(255, 122, 0, 0.35), rgba(255, 122, 0, 0.12));
   border: 4px solid var(--bg-base);
@@ -91,7 +100,7 @@
   object-fit: cover;
 }
 .avatarInitials {
-  font-size: 28px;
+  font-size: 52px;
   font-weight: var(--fw-bold);
   color: var(--text-primary);
 }
@@ -99,8 +108,8 @@
   position: absolute;
   right: 0;
   bottom: 0;
-  width: 28px;
-  height: 28px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background: var(--ggf-orange);
   color: var(--text-on-orange);

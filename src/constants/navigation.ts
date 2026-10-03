@@ -2,6 +2,12 @@ export interface NavItem {
   label: string;
   path: string;
   module: string;
+  /**
+   * Whether this module is actually built. Everything else is shown dimmed in
+   * the sidebar, so the nav reads as a map of what exists rather than a
+   * promise of screens that are still placeholders.
+   */
+  built?: boolean;
 }
 
 export interface NavGroup {
@@ -17,20 +23,20 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     label: "People",
     items: [
-      { label: "Users", path: "/users", module: "users" },
-      { label: "Clients", path: "/users/clients", module: "users" },
-      { label: "Coaches", path: "/coaches", module: "coaches" },
+      { label: "Users", path: "/users", module: "users", built: true },
+      { label: "Clients", path: "/users/clients", module: "users", built: true },
+      { label: "Coaches", path: "/coaches", module: "coaches", built: true },
       { label: "Assignments", path: "/assignments", module: "coaches" },
     ],
   },
   {
     label: "Fitness",
     items: [
-      { label: "Diet Plans", path: "/nutrition/diets", module: "nutrition" },
-      { label: "Food Database", path: "/nutrition/foods", module: "nutrition" },
+      { label: "Free Diet Plans", path: "/nutrition/freediets", module: "nutrition", built: true },
+      { label: "Food Database", path: "/nutrition/foods", module: "nutrition", built: true },
+      { label: "Workouts", path: "/fitness/workouts", module: "workouts", built: true },
       { label: "Food Requests", path: "/nutrition/requests", module: "nutrition" },
       { label: "Food Log", path: "/nutrition/log", module: "nutrition" },
-      { label: "Workouts", path: "/fitness/workouts", module: "workouts" },
       { label: "Challenges", path: "/challenges", module: "challenges" },
       { label: "Rewards", path: "/rewards", module: "rewards" },
     ],
@@ -50,7 +56,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { label: "FAQs", path: "/content/faqs", module: "content" },
       { label: "Quotes", path: "/content/quotes", module: "content" },
       { label: "Media Library", path: "/content/media", module: "content" },
-      { label: "GOGETFIT Plans", path: "/content/gogetfit-plans", module: "content" },
+      { label: "GOGETFIT Plans", path: "/content/gogetfit-plans", module: "content", built: true },
     ],
   },
   {
@@ -59,7 +65,8 @@ export const NAV_GROUPS: NavGroup[] = [
       { label: "Products", path: "/commerce/products", module: "commerce" },
       { label: "Packages", path: "/commerce/packages", module: "commerce" },
       { label: "Orders", path: "/commerce/orders", module: "commerce" },
-      { label: "Coupons", path: "/commerce/coupons", module: "commerce" },
+      { label: "Coupons", path: "/commerce/coupons", module: "commerce", built: true },
+      { label: "In cart", path: "/commerce/in-cart", module: "commerce", built: true },
     ],
   },
   {

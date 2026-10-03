@@ -1,11 +1,28 @@
-export function formatDate(iso: string): string {
+/**
+ * THE date format of the portal: DD/MM/YYYY, everywhere a date is shown.
+ *
+ * `timeZone` is only for values stored as a calendar day at UTC midnight
+ * (coupon validity); everything else is shown in the viewer's local time.
+ */
+export function formatDate(iso: string | null | undefined, options: { timeZone?: "UTC" } = {}): string {
   if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "—";
+  return new Intl.DateTimeFormat("en-GB", { day: "2-digit", month: "2-digit", year: "numeric", timeZone: options.timeZone }).format(date);
 }
 
-export function formatDateTime(iso: string): string {
+/** DD/MM/YYYY, HH:mm (24-hour). */
+export function formatDateTime(iso: string | null | undefined): string {
   if (!iso) return "—";
-  return new Date(iso).toLocaleString("en-IN", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "—";
+  return new Intl.DateTimeFormat("en-GB", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false }).format(date);
+}
+
+/** A calendar day typed as yyyy-mm-dd (a date input's value) as DD/MM/YYYY, never shifted by timezone. */
+export function formatCalendarDay(day: string | null | undefined): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(day ?? "");
+  return m ? `${m[3]}/${m[2]}/${m[1]}` : "—";
 }
 
 export function timeAgo(iso: string): string {

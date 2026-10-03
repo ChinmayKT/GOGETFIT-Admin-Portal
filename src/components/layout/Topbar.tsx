@@ -3,6 +3,7 @@ import { Search, ChevronDown, LogOut, UserCog } from "lucide-react";
 import { CommandSearch } from "../ui/CommandSearch";
 import { Dropdown } from "../ui/Dropdown";
 import { Avatar } from "../ui/Avatar";
+import { resolveMediaUrl } from "../../api/media";
 import { useAuth, useCurrentAdmin } from "../../app/providers/AuthProvider";
 import { useRole } from "../../app/providers/RoleProvider";
 import { useNavigate } from "react-router-dom";
@@ -11,7 +12,9 @@ import styles from "./Topbar.module.css";
 export function Topbar() {
   const [searchOpen, setSearchOpen] = useState(false);
   const admin = useCurrentAdmin();
-  const { logout } = useAuth();
+  // The trimmed admin drives the header text; the full document is where the
+  // uploaded picture lives.
+  const { logout, adminUser } = useAuth();
   const { role, roles, setRoleId } = useRole();
   const navigate = useNavigate();
 
@@ -39,7 +42,11 @@ export function Topbar() {
         <Dropdown
           trigger={
             <button className={styles.userTrigger}>
-              <Avatar name={admin.name} size="sm" />
+              <Avatar
+                name={admin.name}
+                src={resolveMediaUrl(adminUser?.profile.profilePicture) ?? undefined}
+                size="sm"
+              />
               <span className={styles.userInfo}>
                 <span className={styles.userName}>{admin.name}</span>
                 <span className={styles.userEmail}>{admin.email}</span>

@@ -22,8 +22,9 @@
   justify-content: center;
   gap: var(--space-3);
   width: 100%;
-  min-height: var(--topbar-height);
-  padding: var(--space-4) var(--space-5);
+  /* Exactly the topbar's height, open or collapsed, so the two bottom borders line up. */
+  height: var(--topbar-height);
+  padding: 0 var(--space-5);
   border-bottom: 1px solid var(--glass-border);
   flex-shrink: 0;
   cursor: pointer;
@@ -36,7 +37,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
 }
 .brandMark {
   width: 32px;
@@ -107,7 +108,8 @@
   border-radius: var(--radius-md);
   font-size: var(--fs-label);
   font-weight: var(--fw-medium);
-  color: var(--text-secondary);
+  /* Working modules read at full white; unbuilt ones are dimmed by .pending. */
+  color: var(--ggf-white);
   transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
   white-space: nowrap;
 }
@@ -121,5 +123,22 @@
 }
 .active svg {
   color: var(--ggf-orange);
+}
+
+/*
+ * A module that has not been built yet. Dimmed rather than removed or
+ * disabled: the nav still shows the shape of the portal, and the item still
+ * opens its placeholder page, but it never reads as finished work.
+ */
+.pending {
+  color: var(--text-disabled);
+  opacity: 0.55;
+}
+.pending svg {
+  opacity: 0.7;
+}
+.pending:hover {
+  color: var(--text-secondary);
+  opacity: 0.8;
 }
 

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 interface PagedResult<T> {
   rows: T[];
@@ -17,22 +17,30 @@ export function usePagedQuery<T, P extends Record<string, unknown>>(
 
   const paramsKey = JSON.stringify(params);
 
-  const load = useCallback(() => {
+  useEffect(() => {
+    // Every keystroke in a search box starts a request, and responses can come
+    // back out of order. Only the latest request may update the table; a slower
+    // answer to an older query is dropped instead of overwriting newer results.
+    let stale = false;
     setLoading(true);
     setError(false);
     fetcher(params)
       .then((res) => {
+        if (stale) return;
         setRows(res.rows);
         setTotal(res.total);
       })
-      .catch(() => setError(true))
-      .finally(() => setLoading(false));
+      .catch(() => {
+        if (!stale) setError(true);
+      })
+      .finally(() => {
+        if (!stale) setLoading(false);
+      });
+    return () => {
+      stale = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paramsKey, reloadToken]);
-
-  useEffect(() => {
-    load();
-  }, [load]);
 
   return { rows, total, loading, error, retry: () => setReloadToken((t) => t + 1) };
 }

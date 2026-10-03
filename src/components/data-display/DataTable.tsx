@@ -34,6 +34,11 @@ interface DataTableProps<T> {
   sortDir?: "asc" | "desc";
   onSortChange?: (key: string) => void;
   rowActions?: (row: T) => ReactNode;
+  /**
+   * Rows before this page (`(page - 1) * pageSize`), so the SL NO column keeps
+   * counting across pages. 0 for unpaginated tables.
+   */
+  rowOffset?: number;
 }
 
 export function DataTable<T>({
@@ -54,6 +59,7 @@ export function DataTable<T>({
   sortDir,
   onSortChange,
   rowActions,
+  rowOffset = 0,
 }: DataTableProps<T>) {
   if (loading) {
     return (
@@ -101,6 +107,8 @@ export function DataTable<T>({
         <table className={styles.table}>
           <thead>
             <tr>
+              {/* Every table's first column: the row's serial number. */}
+              <th className={styles.serialCell}>SL NO</th>
               {selectable && (
                 <th className={styles.checkboxCell}>
                   <Checkbox checked={allSelected} onChange={toggleAll} />
@@ -123,7 +131,7 @@ export function DataTable<T>({
             </tr>
           </thead>
           <tbody>
-            {rows.map((row) => {
+            {rows.map((row, index) => {
               const id = getRowId(row);
               return (
                 <tr
@@ -131,6 +139,7 @@ export function DataTable<T>({
                   className={cn(onRowClick && styles.clickable)}
                   onClick={() => onRowClick?.(row)}
                 >
+                  <td className={styles.serialCell}>{rowOffset + index + 1}</td>
                   {selectable && (
                     <td className={styles.checkboxCell} onClick={(e) => e.stopPropagation()}>
                       <Checkbox checked={selectedIds?.has(id) ?? false} onChange={() => toggleRow(id)} />
