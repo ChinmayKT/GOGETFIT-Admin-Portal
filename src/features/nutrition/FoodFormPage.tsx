@@ -30,8 +30,8 @@ interface FormState {
   name: string;
   foodType: FoodType;
   brand: string;
-  unit: FoodUnit;
-  quantity: string;
+  servingUnit: FoodUnit;
+  servingQuantity: string;
   notes: string;
   calories: string;
   fat: string;
@@ -40,7 +40,7 @@ interface FormState {
 }
 
 const EMPTY: FormState = {
-  name: "", foodType: "Vegetarian", brand: "", unit: "Serving", quantity: "1", notes: "",
+  name: "", foodType: "Vegetarian", brand: "", servingUnit: "Serving", servingQuantity: "1", notes: "",
   calories: "0", fat: "0", carbs: "0", protein: "0",
 };
 
@@ -50,13 +50,13 @@ const asFormState = (food: Food): FormState => ({
   name: food.name,
   foodType: (FOOD_TYPES as readonly string[]).includes(food.foodType) ? (food.foodType as FoodType) : "Vegetarian",
   brand: food.brand ?? "",
-  unit: (FOOD_UNITS as readonly string[]).includes(food.serving.unit) ? (food.serving.unit as FoodUnit) : "Serving",
-  quantity: String(food.serving.quantity),
+  servingUnit: (FOOD_UNITS as readonly string[]).includes(food.servingUnit) ? (food.servingUnit as FoodUnit) : "Serving",
+  servingQuantity: String(food.servingQuantity),
   notes: food.notes ?? "",
-  calories: String(food.nutrition.calories),
-  fat: String(food.nutrition.fat),
-  carbs: String(food.nutrition.carbs),
-  protein: String(food.nutrition.protein),
+  calories: String(food.calories),
+  fat: String(food.fat),
+  carbs: String(food.carbs),
+  protein: String(food.protein),
 });
 
 export function FoodFormPage() {
@@ -107,9 +107,9 @@ export function FoodFormPage() {
     const next: Partial<Record<keyof FormState, string>> = {};
     if (!form.name.trim()) next.name = "Food name is required";
 
-    const quantity = Number(form.quantity);
-    if (form.quantity.trim() === "" || !Number.isFinite(quantity) || quantity <= 0) {
-      next.quantity = "Enter a quantity greater than 0";
+    const quantity = Number(form.servingQuantity);
+    if (form.servingQuantity.trim() === "" || !Number.isFinite(quantity) || quantity <= 0) {
+      next.servingQuantity = "Enter a quantity greater than 0";
     }
     for (const field of NUMERIC_FIELDS) {
       const value = Number(form[field]);
@@ -129,13 +129,12 @@ export function FoodFormPage() {
         name: form.name.trim(),
         foodType: form.foodType,
         brand: form.brand.trim() === "" ? null : form.brand.trim(),
-        serving: { unit: form.unit, quantity: Number(form.quantity) },
-        nutrition: {
-          calories: Number(form.calories),
-          fat: Number(form.fat),
-          carbs: Number(form.carbs),
-          protein: Number(form.protein),
-        },
+        servingUnit: form.servingUnit,
+        servingQuantity: Number(form.servingQuantity),
+        calories: Number(form.calories),
+        fat: Number(form.fat),
+        carbs: Number(form.carbs),
+        protein: Number(form.protein),
         notes: form.notes.trim() === "" ? null : form.notes.trim(),
       };
 
@@ -208,19 +207,19 @@ export function FoodFormPage() {
             </Field>
             <Field label="Unit" required>
               <Select
-                value={form.unit}
-                onChange={(e) => set("unit", e.target.value as FoodUnit)}
+                value={form.servingUnit}
+                onChange={(e) => set("servingUnit", e.target.value as FoodUnit)}
                 options={FOOD_UNITS.map((u) => ({ label: u, value: u }))}
               />
             </Field>
-            <Field label="Qty" required error={errors.quantity}>
+            <Field label="Qty" required error={errors.servingQuantity}>
               <Input
                 type="number"
                 min="0"
                 step="0.1"
-                value={form.quantity}
-                error={!!errors.quantity}
-                onChange={(e) => set("quantity", e.target.value)}
+                value={form.servingQuantity}
+                error={!!errors.servingQuantity}
+                onChange={(e) => set("servingQuantity", e.target.value)}
               />
             </Field>
           </div>
@@ -254,7 +253,7 @@ export function FoodFormPage() {
 
         <GlassCard>
           <p className="text-title" style={{ marginBottom: 20 }}>
-            Nutrition (per {form.quantity || "1"} {form.unit})
+            Nutrition (per {form.servingQuantity || "1"} {form.servingUnit})
           </p>
           <div className={styles.grid}>
             <Field label="Calories" required error={errors.calories}>

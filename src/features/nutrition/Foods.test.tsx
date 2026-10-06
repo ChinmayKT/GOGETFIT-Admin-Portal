@@ -5,6 +5,7 @@ import { FoodListPage } from "./FoodListPage";
 import { FoodFormPage } from "./FoodFormPage";
 import { ToastProvider } from "../../components/feedback/ToastProvider";
 import { tokenStore, setUnauthorizedHandler } from "../../api/client";
+import { restoreFood, uploadFoodImage } from "../../api/foods";
 
 /** A food in the backend's shape. `legacyFoodId` marks a migrated one. */
 const food = (overrides: Record<string, unknown> = {}) => ({
@@ -12,8 +13,12 @@ const food = (overrides: Record<string, unknown> = {}) => ({
   name: "Paneer Cubes",
   foodType: "Vegetarian",
   brand: "Farm Fresh",
-  serving: { unit: "Grams", quantity: 100 },
-  nutrition: { calories: 114, fat: 2.6, carbs: 0, protein: 21 },
+  servingUnit: "Grams",
+  servingQuantity: 100,
+  calories: 114,
+  fat: 2.6,
+  carbs: 0,
+  protein: 21,
   image: null,
   status: "active",
   legacyFoodId: 1396,
@@ -103,8 +108,12 @@ describe("Food list", () => {
           name: "Grilled Chicken",
           foodType: "Non-Vegetarian",
           brand: null,
-          serving: { unit: "Piece", quantity: 1 },
-          nutrition: { calories: 248, fat: 5.4, carbs: 0, protein: 46 },
+          servingUnit: "Piece",
+          servingQuantity: 1,
+          calories: 248,
+          fat: 5.4,
+          carbs: 7.25,
+          protein: 46,
         }),
       ]),
     );
@@ -112,10 +121,16 @@ describe("Food list", () => {
 
     expect(await screen.findByText("Paneer Cubes")).toBeTruthy();
     expect(screen.getByText("Grilled Chicken")).toBeTruthy();
-    // Values come from the nested document, in the portion they describe.
+    // Values come from the flat fields, in the portion they describe.
     expect(screen.getByText("100 Grams")).toBeTruthy();
+    expect(screen.getByText("1 Piece")).toBeTruthy();
     expect(screen.getByText("114")).toBeTruthy();
+    expect(screen.getByText("248")).toBeTruthy();
     expect(screen.getByText("21.0")).toBeTruthy();
+    expect(screen.getByText("46.0")).toBeTruthy();
+    expect(screen.getByText("7.3")).toBeTruthy();
+    expect(screen.getByText("2.6")).toBeTruthy();
+    expect(screen.getByText("5.4")).toBeTruthy();
     expect(latestList().url).toContain("/admin/foods");
   });
 
@@ -168,6 +183,12 @@ describe("Food list", () => {
     fireEvent.change(screen.getByLabelText("Sort"), { target: { value: "createdAt:desc" } });
     await waitFor(() => expect(latestList().url).toContain("sortKey=createdAt"));
     expect(latestList().url).toContain("sortDir=desc");
+
+    // A flat backend sort key, not a nested path.
+    fireEvent.change(screen.getByLabelText("Sort"), { target: { value: "calories:asc" } });
+    await waitFor(() => expect(latestList().url).toContain("sortKey=calories"));
+    expect(latestList().url).toContain("sortDir=asc");
+    expect(latestList().url).not.toContain("nutrition");
   });
 
   it("shows a placeholder instead of inventing an image", async () => {
@@ -225,7 +246,7 @@ describe("Food list", () => {
 });
 
 describe("Add Food", () => {
-  it("creates a real food through POST with the new document shape", async () => {
+  it("creates a real food through POST with the flat document shape", async () => {
     stubFetch((_url, method) => (method === "POST" ? ok({ food: detail({ id: "new1", legacy: null, legacyFoodId: null }) }, 201) : pageOf([])));
     const router = renderAt("/nutrition/foods/new");
 
@@ -239,12 +260,21 @@ describe("Add Food", () => {
     await waitFor(() => expect(writes().length).toBe(1));
     const [post] = writes();
     expect(post.method).toBe("POST");
-    expect(post.body).toMatchObject({
+    expect(post.body).toEqual({
       name: "Oats Porridge",
       foodType: "Vegetarian",
-      serving: { unit: "Bowl", quantity: 1 },
-      nutrition: { calories: 158, protein: 6 },
+      brand: null,
+      servingUnit: "Bowl",
+      servingQuantity: 1,
+      calories: 158,
+      fat: 0,
+      carbs: 0,
+      protein: 6,
+      notes: null,
     });
+    // The pre-flattening nested shape is never sent.
+    expect(post.body).not.toHaveProperty("serving");
+    expect(post.body).not.toHaveProperty("nutrition");
     // No legacy or audit metadata is ever sent from the form.
     expect(post.body).not.toHaveProperty("legacy");
     expect(post.body).not.toHaveProperty("image");
@@ -267,14 +297,14 @@ describe("Add Food", () => {
 
   it("surfaces a backend validation error instead of claiming success", async () => {
     stubFetch((_url, method) =>
-      method === "POST" ? fail(400, "VALIDATION_ERROR", "nutrition.calories must be at most 20000") : pageOf([]),
+      method === "POST" ? fail(400, "VALIDATION_ERROR", "calories must be at most 20000") : pageOf([]),
     );
     const router = renderAt("/nutrition/foods/new");
 
     fireEvent.change(screen.getByLabelText(/Food Name/), { target: { value: "Absurd" } });
     fireEvent.click(screen.getByRole("button", { name: "Create Food" }));
 
-    expect(await screen.findByText("nutrition.calories must be at most 20000")).toBeTruthy();
+    expect(await screen.findByText("calories must be at most 20000")).toBeTruthy();
     expect(router.state.location.pathname).toBe("/nutrition/foods/new");
   });
 });
@@ -292,6 +322,11 @@ describe("Edit Food", () => {
     expect(name.value).toBe("Paneer Cubes");
     // Legacy id is shown as secondary metadata only.
     expect(screen.getByText("Legacy Food ID: 1396")).toBeTruthy();
+    // The flat fields populate the form.
+    expect((screen.getByLabelText(/^Qty/) as HTMLInputElement).value).toBe("100");
+    expect((screen.getByLabelText(/^Unit/) as HTMLSelectElement).value).toBe("Grams");
+    expect((screen.getByLabelText(/Calories/) as HTMLInputElement).value).toBe("114");
+    expect((screen.getByLabelText(/Protein/) as HTMLInputElement).value).toBe("21");
 
     fireEvent.change(name, { target: { value: "Paneer Cubes (Low Fat)" } });
     fireEvent.click(screen.getByRole("button", { name: "Update Food" }));
@@ -302,7 +337,18 @@ describe("Edit Food", () => {
     expect(put.url).toContain("/admin/foods/f1");
     expect(put.body).not.toHaveProperty("legacy");
     expect(put.body).not.toHaveProperty("migration");
-    expect(put.body).toMatchObject({ name: "Paneer Cubes (Low Fat)" });
+    expect(put.body).toEqual({
+      name: "Paneer Cubes (Low Fat)",
+      foodType: "Vegetarian",
+      brand: "Farm Fresh",
+      servingUnit: "Grams",
+      servingQuantity: 100,
+      calories: 114,
+      fat: 2.6,
+      carbs: 0,
+      protein: 21,
+      notes: "High protein",
+    });
     await waitFor(() => expect(router.state.location.pathname).toBe("/nutrition/foods"));
   });
 
@@ -312,5 +358,31 @@ describe("Edit Food", () => {
 
     expect(await screen.findByText("Could not load this food")).toBeTruthy();
     expect(screen.queryByLabelText(/Food Name/)).toBeNull();
+  });
+});
+
+describe("Food API helpers", () => {
+  it("restores an archived food with a flat status-only PUT", async () => {
+    stubFetch(() => ok({ food: detail({ status: "active" }) }));
+
+    const restored = await restoreFood("f1");
+
+    expect(restored.status).toBe("active");
+    const [put] = writes();
+    expect(put.method).toBe("PUT");
+    expect(put.url).toContain("/admin/foods/f1");
+    expect(put.body).toEqual({ status: "active" });
+  });
+
+  it("uploads a picture to the image endpoint and returns the flat food", async () => {
+    stubFetch(() => ok({ food: detail({ image: { url: "/uploads/foods/f1/a.png", storageKey: "k" } }) }));
+
+    const updated = await uploadFoodImage("f1", new File([new Uint8Array([137, 80, 78, 71])], "a.png", { type: "image/png" }));
+
+    expect(updated.image?.url).toBe("/uploads/foods/f1/a.png");
+    expect(updated.calories).toBe(114);
+    const [put] = writes();
+    expect(put.method).toBe("PUT");
+    expect(put.url).toContain("/admin/foods/f1/image");
   });
 });

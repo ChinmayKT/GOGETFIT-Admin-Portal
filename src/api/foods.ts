@@ -48,11 +48,7 @@ export async function createFood(input: FoodInput): Promise<Food> {
  */
 export async function updateFood(
   id: string,
-  input: Partial<Omit<FoodInput, "serving" | "nutrition">> & {
-    serving?: Partial<FoodInput["serving"]>;
-    nutrition?: Partial<FoodInput["nutrition"]>;
-    status?: FoodStatus;
-  },
+  input: Partial<FoodInput> & { status?: FoodStatus },
 ): Promise<Food> {
   return (await apiRequest<{ food: Food }>(`/admin/foods/${id}`, { method: "PUT", body: input })).food;
 }

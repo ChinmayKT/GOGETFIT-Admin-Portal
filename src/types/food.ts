@@ -1,8 +1,9 @@
 /**
  * The Food Database, as served by /api/admin/foods.
  *
- * One document per food at one portion: nutrition belongs to `serving` and is
- * never per 100g unless the serving says so. The same food at a different
+ * One document per food at one portion: calories/fat/carbs/protein describe
+ * `servingQuantity` x `servingUnit` and are never per 100g unless the serving
+ * says so. The same food at a different
  * portion is a different food, which is why the name is not unique.
  *
  * This file owns the food vocabulary for the whole portal - the units and types
@@ -36,27 +37,19 @@ export interface FoodImage {
   storageKey: string | null;
 }
 
-export interface FoodServing {
-  /** String, not FoodUnit: a stored value is displayed as it is, never coerced. */
-  unit: string;
-  quantity: number;
-}
-
-export interface FoodNutrition {
-  calories: number;
-  fat: number;
-  carbs: number;
-  protein: number;
-}
-
 export interface FoodRow {
   id: string;
   name: string;
   foodType: string;
   brand: string | null;
-  serving: FoodServing;
-  /** The macros for one `serving` - not scaled, not normalised. */
-  nutrition: FoodNutrition;
+  /** String, not FoodUnit: a stored value is displayed as it is, never coerced. */
+  servingUnit: string;
+  servingQuantity: number;
+  /** The macros for one serving - not scaled, not normalised. */
+  calories: number;
+  fat: number;
+  carbs: number;
+  protein: number;
   image: FoodImage | null;
   status: FoodStatus;
   /** Secondary admin metadata; null for a food added in the portal. */
@@ -81,7 +74,11 @@ export interface FoodInput {
   name: string;
   foodType: FoodType;
   brand: string | null;
-  serving: { unit: FoodUnit; quantity: number };
-  nutrition: FoodNutrition;
+  servingUnit: FoodUnit;
+  servingQuantity: number;
+  calories: number;
+  fat: number;
+  carbs: number;
+  protein: number;
   notes: string | null;
 }

@@ -118,11 +118,11 @@ export function FoodListPage() {
       header: "Type",
       render: (f) => <StatusBadge label={f.foodType} tone={f.foodType === "Vegetarian" ? "success" : "warning"} />,
     },
-    { key: "serving", header: "Portion", render: (f) => `${f.serving.quantity} ${f.serving.unit}` },
-    { key: "calories", header: "Calories", render: (f) => number(f.nutrition.calories) },
-    { key: "protein", header: "Protein (g)", render: (f) => number(f.nutrition.protein, 1) },
-    { key: "carbs", header: "Carbs (g)", render: (f) => number(f.nutrition.carbs, 1) },
-    { key: "fat", header: "Fat (g)", render: (f) => number(f.nutrition.fat, 1) },
+    { key: "serving", header: "Portion", render: (f) => `${f.servingQuantity} ${f.servingUnit}` },
+    { key: "calories", header: "Calories", render: (f) => number(f.calories) },
+    { key: "protein", header: "Protein (g)", render: (f) => number(f.protein, 1) },
+    { key: "carbs", header: "Carbs (g)", render: (f) => number(f.carbs, 1) },
+    { key: "fat", header: "Fat (g)", render: (f) => number(f.fat, 1) },
   ];
 
   const filtered = Boolean(search || foodType || unit);
