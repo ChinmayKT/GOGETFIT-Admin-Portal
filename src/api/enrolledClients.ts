@@ -53,6 +53,8 @@ export interface EnrolledClientRow {
   paymentMethod?: PaymentMethod | null;
   /** A manual payment's receipt / UTR / bank reference. */
   paymentReference?: string | null;
+  /** groupBy=user only: how many enrollments the member has (this row is their current/latest). */
+  enrollmentCount?: number;
 }
 
 export type PaymentMethod = "cash" | "upi" | "bank_transfer" | "other";
@@ -104,6 +106,8 @@ export interface EnrolledClientListParams extends Record<string, unknown> {
   coachId?: string;
   planId?: string;
   couponId?: string;
+  /** "user": one row per member (their current/latest enrollment), paged and counted by member. */
+  groupBy?: "user";
   page?: number;
   pageSize?: number;
   sortKey?: string;
@@ -119,6 +123,7 @@ const toQuery = (params: EnrolledClientListParams): string => {
   if (params.coachId) search.set("coachId", params.coachId);
   if (params.planId) search.set("planId", params.planId);
   if (params.couponId) search.set("couponId", params.couponId);
+  if (params.groupBy) search.set("groupBy", params.groupBy);
   if (params.page) search.set("page", String(params.page));
   if (params.pageSize) search.set("pageSize", String(params.pageSize));
   if (params.sortKey) search.set("sortKey", params.sortKey);

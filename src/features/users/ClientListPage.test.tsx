@@ -231,12 +231,48 @@ describe("ClientListPage", () => {
     expect(requests[0]).toContain("pageSize=10");
   });
 
-  it("shows the empty state when there are no enrollments", async () => {
+  it("shows the empty state when there are no clients", async () => {
     stubFetch(() => listResponse([], 0));
 
     renderPage();
 
-    await waitFor(() => expect(screen.getByText("No enrollments found")).toBeTruthy());
+    await waitFor(() => expect(screen.getByText("No clients found")).toBeTruthy());
+  });
+
+  it("asks the server for one row per member, so paging and the total count members", async () => {
+    stubFetch(() => listResponse([makeRow("a")], 25));
+
+    renderPage();
+    await waitFor(() => expect(screen.getByText("Chethan Kumar")).toBeTruthy());
+
+    expect(requests[0]).toContain("groupBy=user");
+    // The total is the server's member count, not anything counted in the browser.
+    expect(screen.getByText(/of 25/)).toBeTruthy();
+    fireEvent.click(screen.getByLabelText(/next/i));
+    await waitFor(() => expect(requests.some((url) => url.includes("page=2") && url.includes("groupBy=user"))).toBe(true));
+  });
+
+  it("searches on the server, still one row per member", async () => {
+    stubFetch(() => listResponse([makeRow("a")]));
+
+    renderPage();
+    await waitFor(() => expect(screen.getByText("Chethan Kumar")).toBeTruthy());
+    fireEvent.change(screen.getByPlaceholderText(/search/i), { target: { value: "Chethan" } });
+
+    await waitFor(() =>
+      expect(requests.some((url) => url.includes("search=Chethan") && url.includes("groupBy=user"))).toBe(true),
+    );
+  });
+
+  it("shows how many plans the member bought, and their current one", async () => {
+    stubFetch(() => listResponse([makeRow("a", { enrollmentCount: 3 })]));
+
+    renderPage();
+
+    await waitFor(() => expect(screen.getByText("Chethan Kumar")).toBeTruthy());
+    expect(screen.getByText("Plans Bought")).toBeTruthy();
+    expect(screen.getByText("3")).toBeTruthy();
+    expect(screen.getAllByText("Chethan Kumar")).toHaveLength(1);
   });
 
   it("shows an error state when the request fails", async () => {

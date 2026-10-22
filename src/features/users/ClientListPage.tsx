@@ -22,11 +22,11 @@ import { formatDate } from "../../utils/format";
 import { STATUS_TONE, dash, money } from "./clientFormat";
 
 /**
- * Clients — one row per enrollment, from GET /api/admin/enrolled-clients.
+ * Clients — one row per member, from GET /api/admin/enrolled-clients?groupBy=user.
  *
- * A member with three purchases appears three times, because each row is a
- * purchase with its own plan, coach, coupon and payment. The related documents
- * are joined by the backend; nothing here is stored twice.
+ * The row shows the member's current/latest enrollment (an active one first,
+ * else the newest); paging, the total and search all count members on the
+ * server. Every enrollment stays in Client Details (Plans tab).
  */
 
 export function ClientListPage() {
@@ -39,7 +39,7 @@ export function ClientListPage() {
   // Server-side paging, search and filtering: the backend caps the page size,
   // so the browser never receives the whole collection.
   const params = useMemo(
-    () => ({ search: query || undefined, status: status || undefined, page, pageSize }),
+    () => ({ search: query || undefined, status: status || undefined, groupBy: "user" as const, page, pageSize }),
     [query, status, page],
   );
   const { rows, total, loading, error, retry } = usePagedQuery(listEnrolledClients, params);
@@ -74,6 +74,7 @@ export function ClientListPage() {
         (c.legacyCoachId ? `Legacy #${c.legacyCoachId}` : "—"),
     },
     { key: "plan", header: "Plan", render: (c) => dash(c.plan?.name ?? null) },
+    { key: "enrollmentCount", header: "Plans Bought", render: (c) => c.enrollmentCount ?? 1 },
     {
       key: "coupon",
       header: "Coupon",
@@ -104,7 +105,7 @@ export function ClientListPage() {
       <PageHeader
         title="Clients"
         breadcrumb={[{ label: "People", path: "/users" }, { label: "Clients" }]}
-        description="One row per enrollment. A member who bought more than once appears once per purchase."
+        description="One row per member, showing their current or latest plan. Every purchase is in the client's details."
         actions={
           <Button variant="primary" icon={<Plus size={15} />} onClick={() => navigate("/users/clients/add")}>
             Add Client
@@ -142,12 +143,12 @@ export function ClientListPage() {
           rowOffset={(page - 1) * pageSize}
         columns={columns}
         rows={rows}
-        getRowId={(c) => c.id}
+        getRowId={(c) => c.client?.id ?? c.id}
         loading={loading}
         error={error}
         onRetry={retry}
         onRowClick={(c) => c.client && navigate(`/users/clients/${c.client.id}`)}
-        emptyTitle="No enrollments found"
+        emptyTitle="No clients found"
         emptyDescription="Try adjusting your search or filters."
       />
 
