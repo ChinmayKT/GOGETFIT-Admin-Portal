@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Pencil, Archive, RotateCcw, Dumbbell, Film, PlayCircle as Youtube } from "lucide-react";
+import { Plus, Pencil, Archive, RotateCcw, Dumbbell, Film, Play, PlayCircle as Youtube } from "lucide-react";
 import { PageHeader } from "../../components/layout/PageHeader";
 import { FilterBar } from "../../components/data-display/FilterBar";
 import { SearchInput } from "../../components/data-display/SearchInput";
@@ -11,8 +11,9 @@ import { Button } from "../../components/ui/Button";
 import { IconButton } from "../../components/ui/IconButton";
 import { StatusBadge } from "../../components/ui/StatusBadge";
 import { ConfirmDialog } from "../../components/ui/ConfirmDialog";
+import { VideoPlayerModal } from "../../components/media/VideoPlayerModal";
 import { useToast } from "../../components/feedback/ToastProvider";
-import { archiveWorkout, listWorkouts, restoreWorkout } from "../../api/workouts";
+import { archiveWorkout, getWorkout, listWorkouts, restoreWorkout } from "../../api/workouts";
 import { resolveMediaUrl } from "../../api/media";
 import { usePagedQuery } from "../../hooks/usePagedQuery";
 import { useDebouncedValue } from "../../hooks/useDebouncedValue";
@@ -47,6 +48,24 @@ const SORT_OPTIONS = [
 
 const equipmentLabel = (value: string) => EQUIPMENT_LABELS[value as WorkoutEquipment] ?? value;
 
+/**
+ * The list row only says whether a video exists (hasVideo), so the player asks
+ * the workout itself for video.url each time it opens one - always the current
+ * stored file. The URL is resolved like every other stored media URL: the
+ * backend issues it on the mobile app's host, the portal loads the /uploads
+ * path from its own origin.
+ */
+const workoutVideoSource = async (w: WorkoutRow) => resolveMediaUrl((await getWorkout(w.id)).video?.url);
+
+interface PlayerState {
+  /** The playable workouts of the page as it was displayed when Play was pressed. */
+  items: (WorkoutRow & { title: string; subtitle: string })[];
+  index: number;
+  /** Whether the list has rows before / after this page. */
+  earlierPages: boolean;
+  laterPages: boolean;
+}
+
 export function WorkoutListPage() {
   const navigate = useNavigate();
   const { show } = useToast();
@@ -59,6 +78,7 @@ export function WorkoutListPage() {
   const [page, setPage] = useState(1);
   const [archiveTarget, setArchiveTarget] = useState<WorkoutRow | null>(null);
   const [busy, setBusy] = useState(false);
+  const [player, setPlayer] = useState<PlayerState | null>(null);
   const pageSize = 10;
 
   const search = useDebouncedValue(query);
@@ -81,6 +101,19 @@ export function WorkoutListPage() {
   const { rows, total, loading, error, retry } = usePagedQuery(listWorkouts, params);
 
   const resetPage = () => setPage(1);
+
+  // Previous / Next walk the rows on screen, in their displayed order, with the
+  // workouts that have no video left out. The page is captured when Play is
+  // pressed, so a refetch underneath cannot shift the player's position.
+  function openPlayer(workout: WorkoutRow) {
+    const items = rows
+      .filter((w) => w.hasVideo)
+      .map((w) => ({ ...w, title: w.name, subtitle: [w.type, equipmentLabel(w.equipment), w.primaryMuscle].filter(Boolean).join(" · ") }));
+    const index = items.findIndex((w) => w.id === workout.id);
+    if (index < 0) return;
+    setPlayer({ items, index, earlierPages: page > 1, laterPages: page * pageSize < total });
+  }
+  const closePlayer = useCallback(() => setPlayer(null), []);
 
   async function handleArchive() {
     if (!archiveTarget) return;
@@ -135,6 +168,28 @@ export function WorkoutListPage() {
               // No thumbnail stored: the placeholder, never an invented image.
               <Dumbbell size={18} color="var(--text-muted)" aria-label="No thumbnail" />
             )}
+            {/* Play only when a video is stored, never a broken player. aria-disabled, not
+                disabled: a click on the unavailable control must not fall through to the row's Edit. */}
+            <button
+              type="button"
+              aria-disabled={!w.hasVideo}
+              aria-label={w.hasVideo ? `Play ${w.name} video` : `No video for ${w.name}`}
+              title={w.hasVideo ? "Play video" : "No video stored"}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (w.hasVideo) openPlayer(w);
+              }}
+              onKeyDown={(e) => e.stopPropagation()}
+              style={{
+                position: "absolute", inset: 0, margin: "auto", width: 30, height: 30, borderRadius: "50%",
+                display: "flex", alignItems: "center", justifyContent: "center", padding: 0,
+                border: "1px solid rgba(255,255,255,.55)", color: "#fff",
+                background: w.hasVideo ? "rgba(0,0,0,.6)" : "rgba(0,0,0,.35)",
+                opacity: w.hasVideo ? 1 : 0.45, cursor: w.hasVideo ? "pointer" : "not-allowed",
+              }}
+            >
+              <Play size={13} fill="currentColor" style={{ marginLeft: 2 }} aria-hidden />
+            </button>
             {w.hasVideo && (
               <span
                 aria-label="Has video"
@@ -319,6 +374,23 @@ export function WorkoutListPage() {
       {!loading && !error && rows.length > 0 && (
         <Pagination page={page} pageSize={pageSize} total={total} onPageChange={setPage} />
       )}
+
+      <VideoPlayerModal
+        items={player?.items ?? []}
+        index={player?.index ?? null}
+        onIndexChange={(index) => setPlayer((p) => (p ? { ...p, index } : p))}
+        onClose={closePlayer}
+        resolveSource={workoutVideoSource}
+        note={({ atStart, atEnd }) => {
+          if (!player) return null;
+          // Pages are a deliberate boundary: the player never loads another page on its own.
+          if (atEnd && player.laterPages) return "Last video on this page. Go to the next page of the list for more.";
+          if (atStart && player.earlierPages) return "First video on this page. Earlier pages have more.";
+          return player.items.length < rows.length || player.laterPages || player.earlierPages
+            ? "Videos on this page of the list, in its order. Workouts without a video are skipped."
+            : null;
+        }}
+      />
 
       <ConfirmDialog
         open={!!archiveTarget}

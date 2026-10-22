@@ -1,0 +1,141 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(6px);
+  animation: fadeIn var(--duration-fast) var(--ease-out);
+}
+
+.panel {
+  width: 100%;
+  max-width: 960px;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: rgba(15, 15, 15, 0.94);
+  border: 1px solid var(--glass-border-bright);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--glass-shadow-lg);
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--glass-border);
+}
+.heading {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.title {
+  font-size: var(--fs-title);
+  font-weight: var(--fw-semibold);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  background: var(--glass-fill-bright);
+  border: 1px solid var(--glass-border-bright);
+  color: var(--ggf-white);
+  cursor: pointer;
+}
+.close:hover {
+  background: var(--glass-fill-hover);
+}
+
+/* 16:9 stage; the video letterboxes inside it whatever its own ratio. */
+.stage {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  max-height: 70vh;
+  background: #000;
+}
+.video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+}
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  color: var(--ggf-white);
+  text-align: center;
+  pointer-events: none;
+}
+.overlay button {
+  pointer-events: auto;
+}
+.errorText {
+  max-width: 460px;
+  color: var(--text-secondary);
+}
+.spin {
+  animation: spin 0.9s linear infinite;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-top: 1px solid var(--glass-border);
+}
+.note {
+  flex: 1;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .backdrop {
+    padding: var(--space-2);
+  }
+  .footer {
+    flex-wrap: wrap;
+  }
+  .note {
+    order: 3;
+    flex-basis: 100%;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
