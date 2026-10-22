@@ -16,6 +16,7 @@ import { getAdminUser } from "../../api/adminUsers";
 import { ApiError } from "../../api/client";
 import { formatCalendarDay, formatDate } from "../../utils/format";
 import type { AccountStatus, AdminUser } from "../../types/admin";
+import { UserFreeDietPlanTab, useUserFreeDietPlan } from "./UserFreeDietPlan";
 import styles from "./UserDetailPage.module.css";
 
 const STATUS_TONE: Record<AccountStatus, StatusTone> = {
@@ -29,6 +30,8 @@ const TABS = [
   { key: "profile", label: "Profile" },
   { key: "health", label: "Health" },
   { key: "plans", label: "Plans" },
+  // The profile-matched free template (not a coach plan).
+  { key: "freeDietPlan", label: "Free Diet Plan" },
   { key: "progress", label: "Progress" },
   { key: "activity", label: "Activity" },
   { key: "challenges", label: "Challenges" },
@@ -51,6 +54,7 @@ export function UserDetailPage() {
   const [error, setError] = useState<ApiError | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [tab, setTab] = useState("overview");
+  const freeDietPlan = useUserFreeDietPlan(id);
   const [photoOpen, setPhotoOpen] = useState(false);
   const closePhoto = useCallback(() => setPhotoOpen(false), []);
 
@@ -186,7 +190,7 @@ export function UserDetailPage() {
         </div>
       )}
 
-      {tab !== "overview" && (
+      {tab !== "overview" && tab !== "freeDietPlan" && (
         <GlassCard>
           <EmptyState
             title={`No ${TABS.find((t) => t.key === tab)?.label.toLowerCase()} recorded yet`}
@@ -194,6 +198,7 @@ export function UserDetailPage() {
           />
         </GlassCard>
       )}
+      {tab === "freeDietPlan" && <UserFreeDietPlanTab state={freeDietPlan.state} onRetry={freeDietPlan.retry} />}
     </>
   );
 }

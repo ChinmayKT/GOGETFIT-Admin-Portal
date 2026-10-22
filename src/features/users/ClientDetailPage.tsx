@@ -20,6 +20,9 @@ import type { AdminUser } from "../../types/admin";
 import { STATUS_TONE, dash, money } from "./clientFormat";
 import { ClientQuestionnaires, useClientQuestionnaires } from "./ClientQuestionnaires";
 import { ClientBodyMetrics, useClientBodyMetrics } from "./ClientBodyMetrics";
+import { ClientDietPlans, useClientDietPlans } from "./ClientDietPlans";
+import { ClientWorkoutPlans, useClientWorkoutPlans } from "./ClientWorkoutPlans";
+import { UserFreeDietPlanTab, useUserFreeDietPlan } from "./UserFreeDietPlan";
 import styles from "./ClientDetailPage.module.css";
 
 /**
@@ -67,6 +70,9 @@ export function ClientDetailPage() {
   // a failure here only affects the Questionnaires tab.
   const questionnaires = useClientQuestionnaires(userId);
   const bodyMetrics = useClientBodyMetrics(userId);
+  const dietPlans = useClientDietPlans(userId);
+  const workoutPlans = useClientWorkoutPlans(userId);
+  const freeDietPlan = useUserFreeDietPlan(userId);
 
   useEffect(() => {
     if (!userId) return;
@@ -174,6 +180,19 @@ export function ClientDetailPage() {
       label: "Body Metrics",
       count: bodyMetrics.state.status === "ready" ? bodyMetrics.state.rows.length : undefined,
     },
+    {
+      key: "dietPlans",
+      label: "Diet Plans",
+      // Distinct plans, not date-run documents: one plan over sparse days is one plan.
+      count: dietPlans.state.status === "ready" ? new Set(dietPlans.state.data.dietPlans.map((p) => p.planId)).size : undefined,
+    },
+    {
+      key: "workoutPlans",
+      label: "Workout Plans",
+      count: workoutPlans.state.status === "ready" ? workoutPlans.state.data.workoutPlans.length : undefined,
+    },
+    // The profile-matched free template - separate from the coach's Diet Plans.
+    { key: "freeDietPlan", label: "Free Diet Plan" },
   ];
 
   const paymentColumns: Column<EnrolledClientRow>[] = [
@@ -327,6 +346,9 @@ export function ClientDetailPage() {
 
       {tab === "questionnaires" && <ClientQuestionnaires state={questionnaires.state} onRetry={questionnaires.retry} />}
       {tab === "bodyMetrics" && <ClientBodyMetrics state={bodyMetrics.state} onRetry={bodyMetrics.retry} />}
+      {tab === "dietPlans" && <ClientDietPlans state={dietPlans.state} onRetry={dietPlans.retry} />}
+      {tab === "workoutPlans" && <ClientWorkoutPlans state={workoutPlans.state} onRetry={workoutPlans.retry} />}
+      {tab === "freeDietPlan" && <UserFreeDietPlanTab state={freeDietPlan.state} onRetry={freeDietPlan.retry} />}
     </>
   );
 }

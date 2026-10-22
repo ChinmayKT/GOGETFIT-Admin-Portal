@@ -150,13 +150,19 @@ describe("Clients → Client detail", () => {
         ? ok({ questionnaires: [{ questionnaireId: "q1", status: "submitted", questions: [] }], total: 1 })
         : url.includes("/body-metrics")
           ? ok({ bodyMetrics: [], total: 0 })
+          : url.includes("/diet-plans")
+            ? ok({ client: { id: "u1", name: "Chethan Kumar" }, today: "2026-10-07", dietPlans: [], schedule: [], missingFoodIds: [] })
+          : url.includes("/workout-plans")
+            ? ok({ client: { id: "u1", name: "Chethan Kumar" }, today: "2026-10-07", timezone: "Asia/Kolkata", workoutPlans: [] })
           : url.includes("/admin/users/")
           ? ok({ user })
           : page(rows),
     );
     renderAt("/users/clients/u1");
     await screen.findByRole("tab", { name: /Overview/ });
-    expect(screen.getAllByRole("tab").map((t) => t.textContent)).toEqual(["Overview", "Profile", "Plans2", "Payments2", "Coaches2", "Questionnaires1", "Body Metrics0"]);
+    await screen.findByRole("tab", { name: "Diet Plans0" });
+    await screen.findByRole("tab", { name: "Workout Plans0" });
+    expect(screen.getAllByRole("tab").map((t) => t.textContent)).toEqual(["Overview", "Profile", "Plans2", "Payments2", "Coaches2", "Questionnaires1", "Body Metrics0", "Diet Plans0", "Workout Plans0", "Free Diet Plan"]);
     expect(screen.getByRole("tab", { name: /Overview/ }).getAttribute("aria-selected")).toBe("true");
   });
 
@@ -209,7 +215,7 @@ describe("Clients → Client detail", () => {
     const table = within(screen.getByRole("table"));
     expect(table.getByText("Bank Transfer")).toBeTruthy();
     expect(table.getByText("UTR123456")).toBeTruthy();
-    fireEvent.click(screen.getByRole("tab", { name: /Plans/ }));
+    fireEvent.click(screen.getByRole("tab", { name: /^Plans/ }));
     expect(screen.getByText("Reference")).toBeTruthy();
     expect(screen.getAllByText("UTR123456").length).toBeGreaterThan(0);
   });
@@ -236,7 +242,7 @@ describe("Clients → Client detail", () => {
   it("Plans: every purchase with amount, dates, coach and payment", async () => {
     stubFetch((url) => (url.includes("/admin/users/") ? ok({ user }) : page(rows)));
     renderAt("/users/clients/u1");
-    fireEvent.click(await screen.findByRole("tab", { name: /Plans/ }));
+    fireEvent.click(await screen.findByRole("tab", { name: /^Plans/ }));
     const cards = screen.getAllByText(/WEEKS GOGETFIT PLAN/, { selector: "p" });
     expect(cards.map((c) => c.textContent)).toEqual(["24 WEEKS GOGETFIT PLAN", "12 WEEKS GOGETFIT PLAN"]);
 
@@ -258,7 +264,7 @@ describe("Clients → Client detail", () => {
     stubFetch((url) => (url.includes("/admin/users/") ? ok({ user }) : page([])));
     renderAt("/users/clients/u1");
     expect(await screen.findByText("No plans bought")).toBeTruthy();
-    fireEvent.click(screen.getByRole("tab", { name: /Plans/ }));
+    fireEvent.click(screen.getByRole("tab", { name: /^Plans/ }));
     expect(screen.getByText("No plans bought")).toBeTruthy();
   });
 
