@@ -67,3 +67,14 @@
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
 }
+
+/* A column's small print under its header, e.g. the sort applied to it. */
+.subheader {
+  margin-top: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ggf-orange);
+  white-space: nowrap;
+}

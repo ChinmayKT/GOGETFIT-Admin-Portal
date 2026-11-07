@@ -10,6 +10,8 @@ import styles from "./DataTable.module.css";
 export interface Column<T> {
   key: string;
   header: string;
+  /** Small print under the header (e.g. the sort applied to this column). */
+  subheader?: ReactNode;
   render?: (row: T) => ReactNode;
   sortable?: boolean;
   width?: string;
@@ -125,6 +127,7 @@ export function DataTable<T>({
                   {col.sortable && sortKey === col.key && (
                     <span className={styles.sortIcon}>{sortDir === "asc" ? "↑" : "↓"}</span>
                   )}
+                  {col.subheader && <div className={styles.subheader}>{col.subheader}</div>}
                 </th>
               ))}
               {rowActions && <th className={styles.actionsHeader} />}

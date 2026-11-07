@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Pencil, Archive, Utensils } from "lucide-react";
+import { Plus, Pencil, Archive, Utensils, ArrowUpDown, ChevronDown, ChevronUp } from "lucide-react";
 import { PageHeader } from "../../components/layout/PageHeader";
 import { FilterBar } from "../../components/data-display/FilterBar";
 import { SearchInput } from "../../components/data-display/SearchInput";
@@ -17,6 +17,8 @@ import { resolveMediaUrl } from "../../api/media";
 import { usePagedQuery } from "../../hooks/usePagedQuery";
 import { useDebouncedValue } from "../../hooks/useDebouncedValue";
 import { FOOD_TYPES, FOOD_UNITS, type FoodRow } from "../../types/food";
+import { FoodSortDrawer } from "./FoodSortDrawer";
+import { describeRules, toSortParam, type SortMetric, type SortRule } from "./foodSort";
 
 /**
  * Food Database - the real /api/admin/foods collection, including the 960 foods
@@ -46,6 +48,11 @@ export function FoodListPage() {
   const [foodType, setFoodType] = useState("");
   const [unit, setUnit] = useState("");
   const [sort, setSort] = useState("name:asc");
+  // The applied nutrition rules (null = none), and the drawer that edits a copy.
+  // In page state like the other filters: a refresh starts from the default.
+  const [sortRules, setSortRules] = useState<SortRule[] | null>(null);
+  const [sortOpen, setSortOpen] = useState(false);
+  const [sortSession, setSortSession] = useState(0);
   const [page, setPage] = useState(1);
   const [archiveTarget, setArchiveTarget] = useState<FoodRow | null>(null);
   const [archiving, setArchiving] = useState(false);
@@ -62,10 +69,13 @@ export function FoodListPage() {
       unit: unit || undefined,
       sortKey,
       sortDir,
+      // Nutrition rules order first, on the server across every match; the
+      // Sort control above then orders the foods they leave tied.
+      sort: sortRules ? toSortParam(sortRules) : undefined,
       page,
       pageSize,
     };
-  }, [search, foodType, unit, sort, page]);
+  }, [search, foodType, unit, sort, sortRules, page]);
 
   const { rows, total, loading, error, retry } = usePagedQuery(listFoods, params);
 
@@ -82,6 +92,22 @@ export function FoodListPage() {
     } finally {
       setArchiving(false);
     }
+  }
+
+  /**
+   * The applied nutrition sort, under its column: priority and direction,
+   * e.g. "1 · High to low". Nothing under a nutrient the sort leaves out.
+   */
+  function ruleUnder(metric: SortMetric) {
+    const at = sortRules?.findIndex((r) => r.metric === metric) ?? -1;
+    if (!sortRules || at < 0) return undefined;
+    const direction = sortRules[at].direction === "desc" ? "High to low" : "Low to high";
+    return (
+      <span data-testid={`sort-rule-${metric}`} title={`Sort rule ${at + 1} of ${sortRules.length}: ${direction}`}>
+        {sortRules.length > 1 ? `${at + 1} · ` : ""}
+        {direction}
+      </span>
+    );
   }
 
   const columns: Column<FoodRow>[] = [
@@ -119,13 +145,32 @@ export function FoodListPage() {
       render: (f) => <StatusBadge label={f.foodType} tone={f.foodType === "Vegetarian" ? "success" : "warning"} />,
     },
     { key: "serving", header: "Portion", render: (f) => `${f.servingQuantity} ${f.servingUnit}` },
-    { key: "calories", header: "Calories", render: (f) => number(f.calories) },
-    { key: "protein", header: "Protein (g)", render: (f) => number(f.protein, 1) },
-    { key: "carbs", header: "Carbs (g)", render: (f) => number(f.carbs, 1) },
-    { key: "fat", header: "Fat (g)", render: (f) => number(f.fat, 1) },
+    { key: "calories", header: "Calories", subheader: ruleUnder("calories"), render: (f) => number(f.calories) },
+    { key: "protein", header: "Protein (g)", subheader: ruleUnder("protein"), render: (f) => number(f.protein, 1) },
+    { key: "carbs", header: "Carbs (g)", subheader: ruleUnder("carbs"), render: (f) => number(f.carbs, 1) },
+    { key: "fat", header: "Fat (g)", subheader: ruleUnder("fat"), render: (f) => number(f.fat, 1) },
   ];
 
   const filtered = Boolean(search || foodType || unit);
+  const sortLabel = SORT_OPTIONS.find((o) => o.value === sort)?.label ?? "Name (A-Z)";
+
+  function openSort() {
+    setSortSession((n) => n + 1);
+    setSortOpen(true);
+  }
+  const closeSort = useCallback(() => setSortOpen(false), []);
+  // Every nutrient on None is the same as Reset: no nutrition sort.
+  function applySort(rules: SortRule[]) {
+    setSortRules(rules.length > 0 ? rules : null);
+    setPage(1);
+    setSortOpen(false);
+  }
+  // Back to the list's own order. Search, filters and the Sort control stay.
+  function resetSort() {
+    setSortRules(null);
+    setPage(1);
+    setSortOpen(false);
+  }
 
   return (
     <>
@@ -166,6 +211,29 @@ export function FoodListPage() {
           onChange={(e) => { setSort(e.target.value); setPage(1); }}
           options={SORT_OPTIONS}
         />
+        <Button
+          icon={<ArrowUpDown size={15} />}
+          iconRight={sortOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+          onClick={openSort}
+          aria-haspopup="dialog"
+          aria-expanded={sortOpen}
+          aria-label={sortRules ? `Sort By: ${describeRules(sortRules)}` : "Sort By"}
+          title={sortRules ? `Sorted by ${describeRules(sortRules)}` : undefined}
+          style={sortRules || sortOpen ? { borderColor: "var(--ggf-orange)", color: "var(--ggf-orange)" } : undefined}
+        >
+          Sort By
+          {sortRules && (
+            <span
+              aria-hidden
+              style={{
+                marginLeft: 6, padding: "0 6px", borderRadius: 999, fontSize: 11, fontWeight: 700,
+                background: "var(--ggf-orange)", color: "#000",
+              }}
+            >
+              {sortRules.length}
+            </span>
+          )}
+        </Button>
       </FilterBar>
 
       <DataTable
@@ -201,6 +269,16 @@ export function FoodListPage() {
       {!loading && !error && rows.length > 0 && (
         <Pagination page={page} pageSize={pageSize} total={total} onPageChange={setPage} />
       )}
+
+      <FoodSortDrawer
+        key={sortSession}
+        open={sortOpen}
+        applied={sortRules}
+        tieBreakLabel={sortLabel}
+        onApply={applySort}
+        onReset={resetSort}
+        onClose={closeSort}
+      />
 
       <ConfirmDialog
         open={!!archiveTarget}

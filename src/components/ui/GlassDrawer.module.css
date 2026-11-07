@@ -10,6 +10,7 @@
 
 .drawer {
   height: 100%;
+  outline: none;
   max-width: 92vw;
   background: rgba(13, 13, 13, 0.94);
   border-left: 1px solid var(--glass-border-bright);
@@ -21,7 +22,8 @@
 
 .header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  gap: var(--space-4);
   justify-content: space-between;
   padding: var(--space-5) var(--space-6);
   border-bottom: 1px solid var(--glass-border);
@@ -31,10 +33,30 @@
   font-size: var(--fs-title);
   font-weight: var(--fw-semibold);
 }
+.description {
+  margin-top: var(--space-2);
+  color: var(--text-secondary);
+  font-size: var(--fs-caption);
+  line-height: 1.5;
+}
 .body {
   padding: var(--space-6);
   overflow-y: auto;
   flex: 1;
+}
+.footer {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: flex-end;
+  padding: var(--space-4) var(--space-6);
+  border-top: 1px solid var(--glass-border);
+  flex-shrink: 0;
+}
+.overlay.closing {
+  animation: fadeOut 220ms var(--ease-out) forwards;
+}
+.drawer.closing {
+  animation: slideOut 220ms var(--ease-out) forwards;
 }
 
 @keyframes fadeIn {
@@ -47,11 +69,25 @@
 }
 @keyframes slideIn {
   from {
-    transform: translateX(24px);
-    opacity: 0;
+    transform: translateX(100%);
   }
   to {
     transform: translateX(0);
-    opacity: 1;
+  }
+}
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes slideOut {
+  to {
+    transform: translateX(100%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .overlay,
+  .drawer {
+    animation-duration: 1ms !important;
   }
 }
