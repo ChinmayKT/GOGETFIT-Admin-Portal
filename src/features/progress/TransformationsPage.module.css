@@ -1,6 +1,6 @@
 .cardGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: var(--space-5);
   margin-bottom: var(--space-6);
 }
@@ -9,68 +9,36 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  padding: 0;
 }
 
-.imagePair {
-  display: flex;
+/* The coach's card is 4:5 (1080 × 1350); shown whole, never cropped. */
+.image {
+  aspect-ratio: 4 / 5;
+  background: rgba(0, 0, 0, 0.25);
 }
-.imageSlot {
-  position: relative;
-  flex: 1;
-  aspect-ratio: 3 / 4;
-  overflow: hidden;
-}
-.imageSlot img {
+.image img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   display: block;
 }
-.imageLabel {
-  position: absolute;
-  bottom: 6px;
-  left: 6px;
-  padding: 2px 8px;
-  border-radius: var(--radius-full);
-  background: rgba(0, 0, 0, 0.55);
-  color: #fff;
-  font-size: var(--fs-caption);
-  font-weight: var(--fw-medium);
-}
-
-.body {
-  padding: var(--space-4);
+.imageFailed {
+  height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-}
-.headerRow {
-  display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 6px;
+  color: var(--text-secondary);
+  font-size: var(--fs-caption);
 }
+
 .title {
+  margin: 0;
+  padding: var(--space-4);
   font-size: var(--fs-body);
   font-weight: var(--fw-semibold);
   color: var(--text-primary);
-}
-.description {
-  font-size: var(--fs-caption);
-  color: var(--text-secondary);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-.meta {
-  display: flex;
-  justify-content: space-between;
-  font-size: var(--fs-caption);
-  color: var(--text-muted);
-}
-.actionsRow {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 4px;
+  overflow-wrap: anywhere;
 }

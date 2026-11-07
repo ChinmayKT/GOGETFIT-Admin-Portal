@@ -16,6 +16,7 @@ import { CoachClients } from "./CoachClients";
 import { resolveMediaUrl } from "../../api/media";
 import { formatDate } from "../../utils/format";
 import type { CoachRecord } from "../../types/coach";
+import { CoachCapacityCard } from "./CoachCapacityCard";
 import { CoachUserCard } from "./CoachUserCard";
 import { CoachLevelPlans } from "./CoachLevelPlans";
 import styles from "../users/UserDetailPage.module.css";
@@ -107,6 +108,10 @@ export function CoachDetailPage() {
         ))}
 
       {tab === "coach" && (
+        <>
+        <div style={{ marginBottom: 24 }}>
+          <CoachCapacityCard coachId={coach.id} />
+        </div>
         <GlassCard>
           <CoachPhotos
             name={user?.name ?? "Coach"}
@@ -119,7 +124,6 @@ export function CoachDetailPage() {
             <Stat label="Specialization" value={profile.specialization ?? "—"} />
             <Stat label="Languages" value={profile.languages.length ? profile.languages.join(", ") : "—"} />
             <Stat label="Transformations" value={String(profile.transformations ?? 0)} />
-            <Stat label="Available Slots" value={String(profile.availableSlots ?? 0)} />
             <Stat label="Coach Status" value={coach.status === "active" ? "Active" : "Inactive"} />
           </div>
           <p className="text-title" style={{ margin: "24px 0 10px" }}>Description</p>
@@ -136,6 +140,7 @@ export function CoachDetailPage() {
             {links.length === 0 && <span className="text-caption">No social links added.</span>}
           </div>
         </GlassCard>
+        </>
       )}
 
       {tab === "plans" && <CoachLevelPlans level={profile.level} />}

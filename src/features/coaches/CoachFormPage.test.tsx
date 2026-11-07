@@ -57,7 +57,7 @@ const coachRecord = (overrides: Record<string, unknown> = {}) => ({
     instagram: "https://instagram.com/asha",
     linkedin: null,
     transformations: 12,
-    availableSlots: 8,
+    monthlySlots: 8,
   },
   status: "active",
   createdBy: "a1",
@@ -206,6 +206,13 @@ describe("CoachFormPage — Add Coach", () => {
 
     expect(screen.getByText("Coach level is required")).toBeTruthy();
     expect(screen.getByText("Enter a full link starting with https://")).toBeTruthy();
+    // Monthly Slots is required: a blank, negative or fractional value never reaches the API.
+    expect(screen.getByText("Enter a whole number from 0 to 100000")).toBeTruthy();
+    for (const bad of ["-1", "1.5"]) {
+      fireEvent.change(screen.getByLabelText(/monthly slots/i), { target: { value: bad } });
+      fireEvent.click(screen.getByRole("button", { name: /create coach/i }));
+      expect(screen.getByText("Enter a whole number from 0 to 100000")).toBeTruthy();
+    }
     expect(writes()).toHaveLength(0);
   });
 
@@ -218,10 +225,12 @@ describe("CoachFormPage — Add Coach", () => {
     fireEvent.change(screen.getByLabelText(/coach level/i), { target: { value: "LEVEL 3" } });
     fireEvent.change(screen.getByLabelText(/specialization/i), { target: { value: "Fat loss" } });
     fireEvent.change(screen.getByLabelText(/known languages/i), { target: { value: "English, Kannada, english" } });
+    fireEvent.change(screen.getByLabelText(/monthly slots/i), { target: { value: "50" } });
     fireEvent.click(screen.getByRole("button", { name: /create coach/i }));
 
     await waitFor(() => expect(router.state.location.pathname).toBe("/coaches/c1"));
     const post = writes()[0];
+    expect(post.body?.profile).toMatchObject({ monthlySlots: 50 });
     expect(post.url).toContain("/admin/coaches");
     expect(post.body?.userId).toBe("u1");
     expect(post.body?.profile).toMatchObject({ level: "LEVEL 3", specialization: "Fat loss" });
@@ -262,6 +271,7 @@ describe("CoachFormPage — Add Coach", () => {
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
     expect(screen.getByAltText("Coach Cover Picture preview").getAttribute("src")).toBe("blob:preview");
     fireEvent.change(screen.getByLabelText(/coach level/i), { target: { value: "LEVEL 1" } });
+    fireEvent.change(screen.getByLabelText(/monthly slots/i), { target: { value: "50" } });
     fireEvent.click(screen.getByRole("button", { name: /create coach/i }));
 
     await waitFor(() => expect(router.state.location.pathname).toBe("/coaches/c1"));
@@ -281,6 +291,7 @@ describe("CoachFormPage — Add Coach", () => {
     searchPhone();
     fireEvent.click(await screen.findByRole("button", { name: /continue/i }));
     fireEvent.change(screen.getByLabelText(/coach level/i), { target: { value: "LEVEL 1" } });
+    fireEvent.change(screen.getByLabelText(/monthly slots/i), { target: { value: "50" } });
     fireEvent.click(screen.getByRole("button", { name: /create coach/i }));
 
     expect(await screen.findByRole("alert")).toHaveProperty("textContent", "This user is already a coach");
@@ -335,6 +346,82 @@ describe("CoachFormPage — Edit Coach", () => {
     expect(patch.body).toMatchObject({ profile: { level: "LEVEL 5" }, status: "inactive" });
     expect(patch.body).not.toHaveProperty("userId");
     expect(await screen.findByText("Coach updated successfully.")).toBeTruthy();
+  });
+
+  const capacity = (overrides: Record<string, unknown> = {}) => ({
+    month: "2026-11", date: "2026-11-05", timezone: "Asia/Kolkata", monthlyCapacity: 50, confirmedBookings: 30, bookedToday: 9,
+    firstBatchSize: 9, nextBatchSize: 3, status: "available", remainingCapacity: 20, currentBatch: 2, releasedToday: 12, availableSlots: 3,
+    history: [{ month: "2026-11", capacity: 50, confirmedBookings: 30, changes: [{ from: 40, to: 50, by: "a1", at: "2026-11-02T10:00:00.000Z" }] }],
+    ...overrides,
+  });
+  const stubCapacity = (summary: unknown) =>
+    stubFetch((url, method) =>
+      url.endsWith("/capacity")
+        ? ok({ capacity: summary })
+        : method === "PATCH"
+          ? ok({ coach: coachRecord() })
+          : ok({ coach: coachRecord() }),
+    );
+
+  it("shows the backend's capacity summary and saves a raised or lowered allocation", async () => {
+    stubCapacity(capacity());
+    const router = renderAt("/coaches/c1/edit");
+    await screen.findByDisplayValue("Fat loss");
+
+    expect(await screen.findByText("Accepting bookings")).toBeTruthy();
+    expect(screen.getByText("Remaining This Month")).toBeTruthy();
+    expect(screen.getByText("Changed from 40 to 50", { exact: false })).toBeTruthy();
+    expect((screen.getByLabelText(/monthly slots/i) as HTMLInputElement).value).toBe("8");
+
+    fireEvent.change(screen.getByLabelText(/monthly slots/i), { target: { value: "25" } });
+    fireEvent.click(screen.getByRole("button", { name: /save changes/i }));
+    await waitFor(() => expect(router.state.location.pathname).toBe("/coaches/c1"));
+    expect(writes()[0].body).toMatchObject({ profile: { monthlySlots: 25 } });
+  });
+
+  it("shows an exhausted coach as fully booked, with no remaining slots", async () => {
+    stubCapacity(capacity({ monthlyCapacity: 25, status: "fully_booked", remainingCapacity: 0, availableSlots: 0, history: [] }));
+    renderAt("/coaches/c1/edit");
+    expect(await screen.findByText("Fully booked")).toBeTruthy();
+    expect(screen.queryByText("History")).toBeNull();
+  });
+
+  it("shows a coach with no allocation as unlimited, not as zero", async () => {
+    stubCapacity(capacity({ monthlyCapacity: null, status: "not_configured", remainingCapacity: null, currentBatch: null, releasedToday: 0, availableSlots: 0, confirmedBookings: 4, history: [] }));
+    renderAt("/coaches/c1/edit");
+    expect(await screen.findByText("Monthly slots not set")).toBeTruthy();
+    expect(screen.getByText("Not set")).toBeTruthy();
+    expect(screen.getByText("No limit")).toBeTruthy();
+    expect(screen.getByText("4")).toBeTruthy();
+  });
+
+  it("a coach with no allocation can be saved unlimited, or given a limit", async () => {
+    const unlimited = coachRecord({ profile: { ...coachRecord().profile, monthlySlots: null } });
+    stubFetch(() => ok({ coach: unlimited }));
+    const router = renderAt("/coaches/c1/edit");
+    await screen.findByDisplayValue("Fat loss");
+    expect((screen.getByLabelText(/monthly slots/i) as HTMLInputElement).value).toBe("");
+
+    // Bad values are still refused; blank is not a bad value here.
+    fireEvent.change(screen.getByLabelText(/monthly slots/i), { target: { value: "-1" } });
+    fireEvent.click(screen.getByRole("button", { name: /save changes/i }));
+    expect(screen.getByText("Enter a whole number from 0 to 100000")).toBeTruthy();
+    expect(writes()).toHaveLength(0);
+
+    fireEvent.change(screen.getByLabelText(/monthly slots/i), { target: { value: "" } });
+    fireEvent.click(screen.getByRole("button", { name: /save changes/i }));
+    await waitFor(() => expect(router.state.location.pathname).toBe("/coaches/c1"));
+    expect(writes()[0].body?.profile).not.toHaveProperty("monthlySlots");
+  });
+
+  it("a configured coach cannot have Monthly Slots blanked", async () => {
+    stubFetch(() => ok({ coach: coachRecord() }));
+    renderAt("/coaches/c1/edit");
+    await screen.findByDisplayValue("Fat loss");
+    fireEvent.change(screen.getByLabelText(/monthly slots/i), { target: { value: "" } });
+    fireEvent.click(screen.getByRole("button", { name: /save changes/i }));
+    expect(screen.getByText("Enter a whole number from 0 to 100000")).toBeTruthy();
+    expect(writes()).toHaveLength(0);
   });
 
   it("shows not found for an unknown coach", async () => {

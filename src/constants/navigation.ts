@@ -44,7 +44,7 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     label: "Progress",
     items: [
-      { label: "Transformations", path: "/progress/transformations", module: "progress" },
+      { label: "Transformations", path: "/progress/transformations", module: "progress", built: true },
       { label: "Measurements", path: "/progress/measurements", module: "progress" },
     ],
   },

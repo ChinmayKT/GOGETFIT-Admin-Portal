@@ -85,7 +85,8 @@ export interface CoachProfile {
   instagram: string | null;
   linkedin: string | null;
   transformations: number | null;
-  availableSlots: number | null;
+  /** Confirmed bookings allowed per calendar month. Null until an admin sets it. */
+  monthlySlots: number | null;
 }
 
 export interface CoachRecord {

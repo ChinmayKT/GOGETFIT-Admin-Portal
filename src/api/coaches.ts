@@ -66,10 +66,11 @@ export async function searchUserByPhone(phone: string): Promise<UserPhoneSearchR
  */
 export type CoachProfileInput = Omit<
   CoachProfile,
-  "transformations" | "availableSlots" | "profilePicture" | "coverPicture"
+  "transformations" | "monthlySlots" | "profilePicture" | "coverPicture"
 > & {
   transformations: number;
-  availableSlots: number;
+  /** Left out to keep a coach with no allocation unlimited. */
+  monthlySlots?: number;
 };
 
 export async function createCoach(userId: string, profile: CoachProfileInput): Promise<CoachRecord> {
@@ -90,6 +91,35 @@ export async function updateCoach(
     body: patch,
   });
   return data.coach;
+}
+
+/** This month's capacity and today's release. Every figure is the backend's own. */
+export interface CoachCapacity {
+  month: string;
+  date: string;
+  timezone: string;
+  /** Null until an admin sets the coach's Monthly Slots. */
+  monthlyCapacity: number | null;
+  confirmedBookings: number;
+  bookedToday: number;
+  firstBatchSize: number;
+  nextBatchSize: number;
+  status: "available" | "fully_booked" | "not_configured";
+  remainingCapacity: number | null;
+  currentBatch: number | null;
+  releasedToday: number;
+  availableSlots: number;
+  history: {
+    month: string;
+    capacity: number;
+    confirmedBookings: number;
+    changes: { from: number | null; to: number; by: string | null; at: string }[];
+  }[];
+}
+
+export async function getCoachCapacity(id: string): Promise<CoachCapacity> {
+  const data = await apiRequest<{ capacity: CoachCapacity }>(`/admin/coaches/${id}/capacity`);
+  return data.capacity;
 }
 
 const IMAGE_PATHS: Record<CoachImageSlot, string> = {

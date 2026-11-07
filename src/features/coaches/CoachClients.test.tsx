@@ -9,7 +9,7 @@ const coachRecord = {
   id: "c1",
   userId: "u-coach",
   user: { id: "u-coach", name: "Prajwal", phone: "918123260930", email: "prajwal@gogetfitonline.com", gender: "male", city: "Davangere", profilePicture: null, roles: ["user", "coach"], status: "active" },
-  profile: { profilePicture: null, coverPicture: null, level: "LEVEL 1", specialization: null, description: null, languages: [], facebook: null, instagram: null, linkedin: null, transformations: 0, availableSlots: 0 },
+  profile: { profilePicture: null, coverPicture: null, level: "LEVEL 1", specialization: null, description: null, languages: [], facebook: null, instagram: null, linkedin: null, transformations: 0, monthlySlots: 0 },
   status: "active",
   createdBy: null,
   updatedBy: null,

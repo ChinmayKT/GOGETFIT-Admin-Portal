@@ -60,7 +60,7 @@ const coach = (id: string, name: string, level: string, specialization: string |
     id,
     userId: `cu-${id}`,
     user: { id: `cu-${id}`, name, phone: null, email: null, gender: null, city: null, profilePicture: null, roles: ["user", "coach"], status: "active" },
-    profile: { profilePicture: null, coverPicture: null, level, specialization, description: null, languages: [], facebook: null, instagram: null, linkedin: null, transformations: 0, availableSlots: 0 },
+    profile: { profilePicture: null, coverPicture: null, level, specialization, description: null, languages: [], facebook: null, instagram: null, linkedin: null, transformations: 0, monthlySlots: 0 },
     status: "active",
     createdBy: null,
     updatedBy: null,

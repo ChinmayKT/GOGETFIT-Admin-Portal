@@ -30,6 +30,7 @@ import {
   type CoachRecord,
   type CoachUserSummary,
 } from "../../types/coach";
+import { CoachCapacityCard } from "./CoachCapacityCard";
 import { CoachUserCard, toCoachUserSummary } from "./CoachUserCard";
 import { CoachImageField, type CoachImageBusy } from "./CoachImageField";
 import { planCountLabel, useLevelPlans } from "./CoachLevelPlans";
@@ -52,7 +53,7 @@ interface ProfileForm {
   instagram: string;
   linkedin: string;
   transformations: string;
-  availableSlots: string;
+  monthlySlots: string;
   status: CoachProfileStatus;
 }
 
@@ -67,7 +68,7 @@ const EMPTY_PROFILE: ProfileForm = {
   instagram: "",
   linkedin: "",
   transformations: "0",
-  availableSlots: "0",
+  monthlySlots: "",
   status: "active",
 };
 
@@ -80,7 +81,7 @@ const fromCoach = (coach: CoachRecord): ProfileForm => ({
   instagram: coach.profile.instagram ?? "",
   linkedin: coach.profile.linkedin ?? "",
   transformations: String(coach.profile.transformations ?? 0),
-  availableSlots: String(coach.profile.availableSlots ?? 0),
+  monthlySlots: coach.profile.monthlySlots === null ? "" : String(coach.profile.monthlySlots),
   status: coach.status,
 });
 
@@ -99,7 +100,7 @@ const isHttpUrl = (value: string) => {
   }
 };
 
-function validateProfile(form: ProfileForm): ProfileErrors {
+function validateProfile(form: ProfileForm, slotsOptional: boolean): ProfileErrors {
   const errors: ProfileErrors = {};
   if (!form.level) errors.level = "Coach level is required";
   if (form.specialization.trim().length > MAX_SPECIALIZATION) {
@@ -117,8 +118,9 @@ function validateProfile(form: ProfileForm): ProfileErrors {
     const value = form[key].trim();
     if (value && !isHttpUrl(value)) errors[key] = "Enter a full link starting with https://";
   }
-  for (const key of ["transformations", "availableSlots"] as const) {
+  for (const key of ["transformations", "monthlySlots"] as const) {
     const value = form[key].trim();
+    if (key === "monthlySlots" && value === "" && slotsOptional) continue;
     const n = Number(value);
     if (value === "" || !Number.isInteger(n) || n < 0 || n > MAX_COUNTER) {
       errors[key] = `Enter a whole number from 0 to ${MAX_COUNTER}`;
@@ -136,7 +138,7 @@ const toProfileInput = (form: ProfileForm): CoachProfileInput => ({
   instagram: form.instagram.trim() || null,
   linkedin: form.linkedin.trim() || null,
   transformations: Number(form.transformations),
-  availableSlots: Number(form.availableSlots),
+  ...(form.monthlySlots.trim() === "" ? {} : { monthlySlots: Number(form.monthlySlots) }),
 });
 
 const errorMessage = (cause: unknown, fallback: string) =>
@@ -477,6 +479,9 @@ function EditCoach({ id }: { id: string }) {
   return (
     <>
       {header}
+      <div style={{ marginBottom: 24 }}>
+        <CoachCapacityCard coachId={id} />
+      </div>
       <CoachProfileEditor
         user={coach.user}
         initial={fromCoach(coach)}
@@ -538,6 +543,8 @@ function CoachProfileEditor({
   onConflict?: () => void;
 }) {
   const [form, setForm] = useState<ProfileForm>(initial);
+  // An existing coach with no allocation stays unlimited until an admin sets one.
+  const slotsOptional = showStatus && initial.monthlySlots === "";
   const [errors, setErrors] = useState<ProfileErrors>({});
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -558,7 +565,7 @@ function CoachProfileEditor({
   }
 
   async function handleSubmit() {
-    const next = validateProfile(form);
+    const next = validateProfile(form, slotsOptional);
     setErrors(next);
     if (Object.keys(next).length > 0) return;
 
@@ -624,14 +631,24 @@ function CoachProfileEditor({
               onChange={(e) => set("transformations", e.target.value)}
             />
           </Field>
-          <Field label="Available Slots" required error={errors.availableSlots}>
+          <Field
+            label="Monthly Slots"
+            required={!slotsOptional}
+            error={errors.monthlySlots}
+            helperText={
+              slotsOptional
+                ? "Not set: this coach has no monthly limit. Enter a number to apply one."
+                : "Maximum confirmed customer bookings allowed for this coach per calendar month."
+            }
+          >
             <Input
               type="number"
               min="0"
               step="1"
-              value={form.availableSlots}
-              error={!!errors.availableSlots}
-              onChange={(e) => set("availableSlots", e.target.value)}
+              value={form.monthlySlots}
+              error={!!errors.monthlySlots}
+              placeholder="e.g. 50"
+              onChange={(e) => set("monthlySlots", e.target.value)}
             />
           </Field>
           {showStatus && (

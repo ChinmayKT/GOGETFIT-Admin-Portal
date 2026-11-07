@@ -43,7 +43,7 @@ const coachRecord = (pictures: { profilePicture?: unknown; coverPicture?: unknow
     instagram: null,
     linkedin: null,
     transformations: 0,
-    availableSlots: 0,
+    monthlySlots: 0,
     ...pictures,
   },
   status: "active",

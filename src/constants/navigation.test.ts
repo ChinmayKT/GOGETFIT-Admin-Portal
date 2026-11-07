@@ -10,6 +10,7 @@ const BUILT = [
   "/nutrition/freediets",
   "/nutrition/foods",
   "/fitness/workouts",
+  "/progress/transformations",
   "/content/gogetfit-plans",
   "/commerce/coupons",
   "/commerce/in-cart",
