@@ -1,0 +1,146 @@
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+.metrics5 {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+@media (max-width: 1200px) {
+  .metrics,
+  .metrics5 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.who {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.whoText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.whoName {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.sub {
+  font-size: var(--fs-caption);
+  color: var(--text-muted);
+}
+.code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-primary);
+}
+.nowrap {
+  white-space: nowrap;
+}
+.dateField {
+  width: 168px;
+  flex: 0 0 168px;
+}
+
+.profile {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  margin-bottom: var(--space-5);
+}
+.profileInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.profileName {
+  font-size: var(--fs-headline);
+  font-weight: 700;
+}
+.metaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-5);
+  color: var(--text-secondary);
+  font-size: var(--fs-label);
+}
+.profileSide {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-3);
+}
+
+.section {
+  margin-bottom: var(--space-5);
+}
+.sectionTitle {
+  font-size: var(--fs-label);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: var(--space-3);
+}
+.fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3) var(--space-5);
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.fieldLabel {
+  font-size: var(--fs-caption);
+  color: var(--text-muted);
+}
+.fieldValue {
+  color: var(--text-primary);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+}
+.timelineItem {
+  display: grid;
+  grid-template-columns: 16px 1fr auto;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.timelineDot {
+  width: 10px;
+  height: 10px;
+  margin-top: 5px;
+  border-radius: 50%;
+  background: var(--accent-orange, #ff7a00);
+  box-shadow: 0 0 0 4px rgba(255, 122, 0, 0.15);
+}
+.timelineAction {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.timelineMeta {
+  text-align: right;
+  font-size: var(--fs-caption);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.toolbarEnd {
+  margin-left: auto;
+}

@@ -26,6 +26,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { label: "Users", path: "/users", module: "users", built: true },
       { label: "Clients", path: "/users/clients", module: "users", built: true },
       { label: "Coaches", path: "/coaches", module: "coaches", built: true },
+      { label: "Brand Ambassadors", path: "/ambassadors", module: "users", built: true },
       { label: "Assignments", path: "/assignments", module: "coaches" },
     ],
   },

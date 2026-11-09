@@ -7,6 +7,7 @@ const BUILT = [
   "/users",
   "/users/clients",
   "/coaches",
+  "/ambassadors",
   "/nutrition/freediets",
   "/nutrition/foods",
   "/fitness/workouts",

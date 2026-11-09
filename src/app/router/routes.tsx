@@ -1,3 +1,5 @@
+import { AmbassadorListPage } from "../../features/ambassadors/AmbassadorListPage";
+import { AmbassadorDetailPage } from "../../features/ambassadors/AmbassadorDetailPage";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import { AppShell } from "../../components/layout/AppShell";
 import { PlaceholderPage } from "../../components/layout/PlaceholderPage";
@@ -98,6 +100,8 @@ export const router = createBrowserRouter([
       { path: "users/:id", element: <UserDetailPage /> },
       { path: "users/:id/edit", element: <AddUserPage /> },
 
+      { path: "ambassadors", element: <AmbassadorListPage /> },
+      { path: "ambassadors/:id", element: <AmbassadorDetailPage /> },
       { path: "coaches", element: <CoachListPage /> },
       { path: "coaches/new", element: <CoachFormPage /> },
       { path: "coaches/:id", element: <CoachDetailPage /> },

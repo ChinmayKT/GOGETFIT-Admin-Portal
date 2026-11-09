@@ -3,7 +3,7 @@ import {
   LayoutDashboard, Users, UserCheck, Award, Link2, Utensils, Apple, Inbox, ClipboardList,
   Dumbbell, Trophy, Gift, Sparkles, Ruler, FileText, Image, HelpCircle, Quote, Folder,
   Package, Boxes, ShoppingCart, Ticket, Bell, BarChart3, UserCog, ShieldCheck, History,
-  Settings, ToggleLeft,
+  Settings, ToggleLeft, Handshake,
   Wallet, CreditCard, ArrowLeftRight, RotateCcw, TrendingUp, RefreshCw, Crown, Tag,
 } from "lucide-react";
 import logo from "../../assets/brand/gogetfit-logo-transparent.png";
@@ -27,6 +27,7 @@ const ICONS: Record<string, typeof LayoutDashboard> = {
   "/users": Users,
   "/users/clients": UserCheck,
   "/coaches": Award,
+  "/ambassadors": Handshake,
   "/assignments": Link2,
   "/nutrition/freediets": Utensils,
   "/nutrition/foods": Apple,
