@@ -29,7 +29,11 @@ dist-ssr
 # local Claude Code session state
 .claude/
 
-# Local environment (never commit; may hold API targets/secrets)
+# Local environment (never commit; may hold secrets). The per-mode files below
+# hold only public backend URLs and are committed; personal overrides go in
+# .env.<mode>.local, which stays ignored.
 .env
 .env.*
 !.env.example
+!.env.development
+!.env.staging

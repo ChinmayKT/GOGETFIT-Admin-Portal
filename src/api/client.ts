@@ -4,7 +4,9 @@
  * place.
  */
 
-const BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? "/api").replace(/\/$/, "");
+import { apiConfig } from "./config";
+
+const BASE_URL = apiConfig.apiBaseUrl;
 
 const TOKEN_KEY = "ggf-admin-token";
 
